@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:*; img-src 'self' https:"
+    />
+    <title>Welcome to PRPal</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg-primary: #0d1117;
+        --bg-secondary: #161b22;
+        --bg-tertiary: #21262d;
+        --text-primary: #f0f6fc;
+        --text-secondary: #8b949e;
+        --accent: #58a6ff;
+        --accent-hover: #79b8ff;
+        --success: #3fb950;
+        --warning: #d29922;
+        --error: #f85149;
+        --border: #30363d;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .container {
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 40px 32px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .logo {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+
+      .logo svg {
+        width: 64px;
+        height: 64px;
+        color: var(--accent);
+      }
+
+      .logo h1 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-top: 16px;
+      }
+
+      .logo p {
+        color: var(--text-secondary);
+        margin-top: 8px;
+        font-size: 14px;
+      }
+
+      .steps {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 32px;
+      }
+
+      .step-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--border);
+        transition:
+          background 0.3s,
+          transform 0.3s;
+      }
+
+      .step-dot.active {
+        background: var(--accent);
+        transform: scale(1.25);
+      }
+
+      .step-dot.completed {
+        background: var(--success);
+      }
+
+      .step-content {
+        flex: 1;
+        display: none;
+      }
+
+      .step-content.active {
+        display: block;
+      }
+
+      .step-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .step-desc {
+        color: var(--text-secondary);
+        margin-bottom: 24px;
+        line-height: 1.5;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        font-size: 14px;
+      }
+
+      .label-hint {
+        font-weight: 400;
+        color: var(--text-secondary);
+        font-size: 12px;
+        margin-left: 8px;
+      }
+
+      input[type='text'],
+      input[type='password'] {
+        width: 100%;
+        padding: 12px 16px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 14px;
+        transition: border-color 0.2s;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+
+      input::placeholder {
+        color: var(--text-secondary);
+      }
+
+      .input-help {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 6px;
+      }
+
+      .input-help a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      .input-help a:hover {
+        text-decoration: underline;
+      }
+
+      .validation-error {
+        color: var(--error);
+        font-size: 12px;
+        margin-top: 6px;
+        display: none;
+      }
+
+      .validation-error.show {
+        display: block;
+      }
+
+      .check-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-bottom: 12px;
+      }
+
+      .check-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .check-icon.pending {
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
+      }
+
+      .check-icon.checking {
+        background: var(--bg-tertiary);
+        color: var(--accent);
+        animation: pulse 1s infinite;
+      }
+
+      .check-icon.success {
+        background: rgba(63, 185, 80, 0.2);
+        color: var(--success);
+      }
+
+      .check-icon.error {
+        background: rgba(248, 81, 73, 0.2);
+        color: var(--error);
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .check-content {
+        flex: 1;
+      }
+
+      .check-title {
+        font-weight: 500;
+        margin-bottom: 2px;
+      }
+
+      .check-desc {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+
+      .feature-list {
+        display: grid;
+        gap: 16px;
+      }
+
+      .feature-item {
+        display: flex;
+        gap: 16px;
+        padding: 16px;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+      }
+
+      .feature-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(88, 166, 255, 0.1);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+        flex-shrink: 0;
+      }
+
+      .feature-content h3 {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .feature-content p {
+        font-size: 13px;
+        color: var(--text-secondary);
+        line-height: 1.4;
+      }
+
+      .buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 32px;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid var(--border);
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+      }
+
+      .btn:hover {
+        background: var(--bg-tertiary);
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: white;
+        flex: 1;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        background: var(--accent-hover);
+      }
+
+      .skip-link {
+        text-align: center;
+        margin-top: 16px;
+      }
+
+      .skip-link a {
+        color: var(--text-secondary);
+        font-size: 13px;
+        text-decoration: none;
+      }
+
+      .skip-link a:hover {
+        color: var(--text-primary);
+      }
+
+      .success-animation {
+        text-align: center;
+        padding: 40px 0;
+      }
+
+      .success-animation svg {
+        width: 80px;
+        height: 80px;
+        color: var(--success);
+        animation: scaleIn 0.5s ease-out;
+      }
+
+      @keyframes scaleIn {
+        0% {
+          transform: scale(0);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .success-animation h2 {
+        font-size: 24px;
+        margin-top: 24px;
+        margin-bottom: 8px;
+      }
+
+      .success-animation p {
+        color: var(--text-secondary);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo">
+        <svg viewBox="0 0 16 16" fill="currentColor">
+          <path
+            d="M7.177 3.073L9.573.677A.25.25 0 0110 .854v4.792a.25.25 0 01-.427.177L7.177 3.427a.25.25 0 010-.354zM3.75 2.5a.75.75 0 100 1.5.75.75 0 000-1.5zm-2.25.75a2.25 2.25 0 113 2.122v5.256a2.251 2.251 0 11-1.5 0V5.372A2.25 2.25 0 011.5 3.25zM11 2.5h-1V4h1a1 1 0 011 1v5.628a2.251 2.251 0 101.5 0V5A2.5 2.5 0 0011 2.5zm1 10.25a.75.75 0 111.5 0 .75.75 0 01-1.5 0zM3.75 12a.75.75 0 100 1.5.75.75 0 000-1.5z"
+          />
+        </svg>
+        <h1>PRPal</h1>
+        <p>Your AI-powered PR review companion</p>
+      </div>
+
+      <div class="steps">
+        <div class="step-dot active" data-step="0"></div>
+        <div class="step-dot" data-step="1"></div>
+        <div class="step-dot" data-step="2"></div>
+        <div class="step-dot" data-step="3"></div>
+      </div>
+
+      <!-- Step 0: Welcome -->
+      <div class="step-content active" data-step="0">
+        <h2 class="step-title">Welcome!</h2>
+        <p class="step-desc">
+          Let's get you set up in just a few steps. You'll need your GitHub credentials and we'll
+          verify everything works.
+        </p>
+
+        <div class="feature-list">
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                <path
+                  d="M8 16a2 2 0 001.985-1.75c.017-.137-.097-.25-.235-.25h-3.5c-.138 0-.252.113-.235.25A2 2 0 008 16zM8 1.5A3.5 3.5 0 004.5 5v2.947c0 .346-.102.683-.294.97l-1.703 2.556a.018.018 0 00-.003.01l.001.006c0 .002.002.004.004.006a.017.017 0 00.006.004l.007.001h10.964l.007-.001a.016.016 0 00.006-.004.016.016 0 00.004-.006l.001-.007a.017.017 0 00-.003-.01l-1.703-2.554a1.75 1.75 0 01-.294-.97V5A3.5 3.5 0 008 1.5z"
+                />
+              </svg>
+            </div>
+            <div class="feature-content">
+              <h3>Instant Notifications</h3>
+              <p>Get notified when PRs need your review, individually or via team</p>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                <path
+                  d="M5.75 7.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5a.75.75 0 01.75-.75zm5.25.75a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5z"
+                />
+                <path
+                  d="M6.25 0a.75.75 0 000 1.5H7.5v2H3.75A2.25 2.25 0 001.5 5.75V8H.75a.75.75 0 000 1.5h.75v2.75a2.25 2.25 0 002.25 2.25h8.5a2.25 2.25 0 002.25-2.25V9.5h.75a.75.75 0 000-1.5h-.75V5.75a2.25 2.25 0 00-2.25-2.25H9V1.5h1.25a.75.75 0 000-1.5h-4zM3.75 5h8.5a.75.75 0 01.75.75v6.5a.75.75 0 01-.75.75h-8.5a.75.75 0 01-.75-.75v-6.5a.75.75 0 01.75-.75z"
+                />
+              </svg>
+            </div>
+            <div class="feature-content">
+              <h3>AI-Powered Reviews</h3>
+              <p>Get intelligent code analysis using Claude via OpenCode CLI</p>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                <path
+                  d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"
+                />
+                <path d="M8 6.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM5 8a3 3 0 116 0 3 3 0 01-6 0z" />
+              </svg>
+            </div>
+            <div class="feature-content">
+              <h3>Menu Bar Access</h3>
+              <p>Quick access to all your pending PRs from the menu bar</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="btn btn-primary" onclick="nextStep()">Get Started</button>
+        </div>
+      </div>
+
+      <!-- Step 1: GitHub Token -->
+      <div class="step-content" data-step="1">
+        <h2 class="step-title">Connect to GitHub</h2>
+        <p class="step-desc">
+          Enter your GitHub Personal Access Token. This stays on your machine and is never sent
+          anywhere except GitHub's API.
+        </p>
+
+        <div class="form-group">
+          <label for="githubPat">Personal Access Token</label>
+          <input
+            type="password"
+            id="githubPat"
+            placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+            autocomplete="off"
+          />
+          <p class="input-help">
+            Need a token?
+            <a href="https://github.com/settings/tokens/new?scopes=repo,read:org" target="_blank"
+              >Create one here</a
+            >
+            with <code>repo</code> and <code>read:org</code> scopes.
+          </p>
+          <p class="validation-error" id="patError">Please enter a valid GitHub token</p>
+        </div>
+
+        <div class="form-group">
+          <label for="githubUsername">Your GitHub Username</label>
+          <input type="text" id="githubUsername" placeholder="your-username" />
+          <p class="validation-error" id="usernameError">Please enter your GitHub username</p>
+        </div>
+
+        <div class="form-group">
+          <label for="githubOrg">Organization to Monitor</label>
+          <input type="text" id="githubOrg" placeholder="OsomePteLtd" />
+          <p class="input-help">The organization whose PRs you want to track</p>
+          <p class="validation-error" id="orgError">Please enter an organization name</p>
+        </div>
+
+        <div class="buttons">
+          <button class="btn" onclick="prevStep()">Back</button>
+          <button class="btn btn-primary" onclick="validateAndNext()">Continue</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Verification -->
+      <div class="step-content" data-step="2">
+        <h2 class="step-title">Verifying Setup</h2>
+        <p class="step-desc">Let's make sure everything is configured correctly.</p>
+
+        <div id="checkList">
+          <div class="check-item" id="checkToken">
+            <div class="check-icon pending">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 4a4 4 0 100 8 4 4 0 000-8z" />
+              </svg>
+            </div>
+            <div class="check-content">
+              <div class="check-title">GitHub Token</div>
+              <div class="check-desc">Verifying your access token...</div>
+            </div>
+          </div>
+
+          <div class="check-item" id="checkOrg">
+            <div class="check-icon pending">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 4a4 4 0 100 8 4 4 0 000-8z" />
+              </svg>
+            </div>
+            <div class="check-content">
+              <div class="check-title">Organization Access</div>
+              <div class="check-desc">Checking organization membership...</div>
+            </div>
+          </div>
+
+          <div class="check-item" id="checkTeams">
+            <div class="check-icon pending">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 4a4 4 0 100 8 4 4 0 000-8z" />
+              </svg>
+            </div>
+            <div class="check-content">
+              <div class="check-title">Team Detection</div>
+              <div class="check-desc">Finding your teams...</div>
+            </div>
+          </div>
+
+          <div class="check-item" id="checkOpencode">
+            <div class="check-icon pending">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 4a4 4 0 100 8 4 4 0 000-8z" />
+              </svg>
+            </div>
+            <div class="check-content">
+              <div class="check-title">OpenCode CLI</div>
+              <div class="check-desc">Checking for AI review support...</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="btn" onclick="prevStep()">Back</button>
+          <button class="btn btn-primary" id="verifyNextBtn" onclick="nextStep()" disabled>
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Complete -->
+      <div class="step-content" data-step="3">
+        <div class="success-animation">
+          <svg viewBox="0 0 16 16" fill="currentColor">
+            <path
+              d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"
+            />
+          </svg>
+          <h2>You're All Set!</h2>
+          <p>PRPal is now running in your menu bar.</p>
+        </div>
+
+        <div class="feature-list" style="margin-top: 32px">
+          <div class="feature-item">
+            <div class="feature-icon" style="background: rgba(63, 185, 80, 0.1)">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                style="color: var(--success)"
+              >
+                <path
+                  d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"
+                />
+              </svg>
+            </div>
+            <div class="feature-content">
+              <h3>Click the menu bar icon</h3>
+              <p>View your pending PRs anytime from the menu bar</p>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon" style="background: rgba(63, 185, 80, 0.1)">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                style="color: var(--success)"
+              >
+                <path
+                  d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"
+                />
+              </svg>
+            </div>
+            <div class="feature-content">
+              <h3>Right-click for options</h3>
+              <p>Access settings, refresh, and more via the context menu</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="btn btn-primary" onclick="finishOnboarding()">Start Using App</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = 'http://localhost:3847'
+      let currentStep = 0
+      const totalSteps = 4
+
+      const config = {
+        pat: '',
+        username: '',
+        org: '',
+      }
+
+      function updateStepDots() {
+        document.querySelectorAll('.step-dot').forEach((dot, index) => {
+          dot.classList.remove('active', 'completed')
+          if (index === currentStep) {
+            dot.classList.add('active')
+          } else if (index < currentStep) {
+            dot.classList.add('completed')
+          }
+        })
+
+        document.querySelectorAll('.step-content').forEach((content, index) => {
+          content.classList.toggle('active', index === currentStep)
+        })
+      }
+
+      function nextStep() {
+        if (currentStep < totalSteps - 1) {
+          currentStep++
+          updateStepDots()
+
+          if (currentStep === 2) {
+            runVerification()
+          }
+        }
+      }
+
+      function prevStep() {
+        if (currentStep > 0) {
+          currentStep--
+          updateStepDots()
+        }
+      }
+
+      function validateAndNext() {
+        const pat = document.getElementById('githubPat').value.trim()
+        const username = document.getElementById('githubUsername').value.trim()
+        const org = document.getElementById('githubOrg').value.trim()
+
+        let valid = true
+
+        document
+          .getElementById('patError')
+          .classList.toggle('show', !pat || !pat.startsWith('ghp_'))
+        if (!pat || !pat.startsWith('ghp_')) valid = false
+
+        document.getElementById('usernameError').classList.toggle('show', !username)
+        if (!username) valid = false
+
+        document.getElementById('orgError').classList.toggle('show', !org)
+        if (!org) valid = false
+
+        if (valid) {
+          config.pat = pat
+          config.username = username
+          config.org = org
+          nextStep()
+        }
+      }
+
+      async function runVerification() {
+        const checks = ['checkToken', 'checkOrg', 'checkTeams', 'checkOpencode']
+
+        for (const checkId of checks) {
+          setCheckStatus(checkId, 'checking')
+        }
+
+        // Verify token
+        try {
+          const tokenResult = await verifyToken()
+          setCheckStatus(
+            'checkToken',
+            tokenResult.success ? 'success' : 'error',
+            tokenResult.success ? 'Token is valid' : tokenResult.error
+          )
+
+          if (!tokenResult.success) {
+            document.getElementById('verifyNextBtn').disabled = true
+            return
+          }
+        } catch (e) {
+          setCheckStatus('checkToken', 'error', 'Failed to verify token')
+          return
+        }
+
+        // Verify org access
+        try {
+          const orgResult = await verifyOrg()
+          setCheckStatus(
+            'checkOrg',
+            orgResult.success ? 'success' : 'error',
+            orgResult.success ? `Access to ${config.org} confirmed` : orgResult.error
+          )
+        } catch (e) {
+          setCheckStatus('checkOrg', 'error', 'Failed to verify organization')
+        }
+
+        // Detect teams
+        try {
+          const teamsResult = await detectTeams()
+          setCheckStatus('checkTeams', 'success', `Found ${teamsResult.count} team(s)`)
+        } catch (e) {
+          setCheckStatus('checkTeams', 'success', 'No teams found (optional)')
+        }
+
+        // Check OpenCode
+        try {
+          const opencodeResult = await checkOpenCode()
+          setCheckStatus(
+            'checkOpencode',
+            opencodeResult.installed ? 'success' : 'pending',
+            opencodeResult.installed
+              ? 'OpenCode CLI detected'
+              : 'Not installed (AI reviews disabled)'
+          )
+        } catch (e) {
+          setCheckStatus('checkOpencode', 'pending', 'OpenCode not detected (optional)')
+        }
+
+        // Save config and enable next
+        await saveConfig()
+        document.getElementById('verifyNextBtn').disabled = false
+      }
+
+      function setCheckStatus(checkId, status, message) {
+        const check = document.getElementById(checkId)
+        const icon = check.querySelector('.check-icon')
+        const desc = check.querySelector('.check-desc')
+
+        icon.className = 'check-icon ' + status
+
+        const icons = {
+          pending:
+            '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4a4 4 0 100 8 4 4 0 000-8z"/></svg>',
+          checking:
+            '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4a4 4 0 100 8 4 4 0 000-8z"/></svg>',
+          success:
+            '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg>',
+          error:
+            '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/></svg>',
+        }
+
+        icon.innerHTML = icons[status] || icons.pending
+        if (message) desc.textContent = message
+      }
+
+      async function verifyToken() {
+        try {
+          const response = await fetch(`${API_BASE}/api/onboarding/verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pat: config.pat, org: config.org }),
+          })
+
+          if (!response.ok) {
+            const error = await response.json()
+            return { success: false, error: error.error || 'Invalid token' }
+          }
+
+          const data = await response.json()
+          // Store the verified username
+          if (data.username) {
+            config.username = data.username
+            document.getElementById('githubUsername').value = data.username
+          }
+          // Store teams for later use
+          config.teams = data.teams || []
+          config.orgAccess = data.orgAccess
+
+          return { success: data.tokenValid }
+        } catch (e) {
+          return { success: false, error: 'Failed to connect to server' }
+        }
+      }
+
+      async function verifyOrg() {
+        // Already verified in verifyToken, just return cached result
+        return {
+          success: config.orgAccess !== false,
+          error: config.orgAccess === false ? 'No access to organization' : null,
+        }
+      }
+
+      async function detectTeams() {
+        // Already detected in verifyToken
+        return { count: config.teams?.length || 0 }
+      }
+
+      async function checkOpenCode() {
+        try {
+          const response = await fetch(`${API_BASE}/api/onboarding/opencode`)
+          if (!response.ok) {
+            return { installed: false }
+          }
+          return await response.json()
+        } catch (e) {
+          return { installed: false }
+        }
+      }
+
+      async function saveConfig() {
+        try {
+          const response = await fetch(`${API_BASE}/api/onboarding/complete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              pat: config.pat,
+              username: config.username,
+              org: config.org,
+            }),
+          })
+
+          if (!response.ok) {
+            console.error('Failed to save config')
+          }
+        } catch (e) {
+          console.error('Failed to save config:', e)
+        }
+      }
+
+      function finishOnboarding() {
+        // Close window and start using app
+        if (window.electronAPI) {
+          window.electronAPI.finishOnboarding()
+        } else {
+          window.close()
+        }
+      }
+
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms))
+      }
+    </script>
+  </body>
+</html>

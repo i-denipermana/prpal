@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https:; connect-src 'self' http://localhost:*"
+    />
+    <title>PRPal</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2d2d2d;
+        --bg-hover: #3d3d3d;
+        --text-primary: #ffffff;
+        --text-secondary: #a0a0a0;
+        --accent: #58a6ff;
+        --success: #3fb950;
+        --warning: #d29922;
+        --error: #f85149;
+        --border: #404040;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-size: 13px;
+        line-height: 1.4;
+        overflow: hidden;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .header-title {
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .btn {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .btn:hover {
+        background: var(--bg-hover);
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .btn-primary:hover {
+        opacity: 0.9;
+      }
+
+      .status-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border);
+        font-size: 11px;
+        color: var(--text-secondary);
+      }
+
+      .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--success);
+      }
+
+      .status-dot.inactive {
+        background: var(--text-secondary);
+      }
+
+      .pr-list {
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .pr-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+
+      .pr-item:hover {
+        background: var(--bg-hover);
+      }
+
+      .pr-item.new {
+        background: rgba(88, 166, 255, 0.1);
+      }
+
+      .pr-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--bg-secondary);
+      }
+
+      .pr-content {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .pr-title {
+        font-weight: 500;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .pr-meta {
+        display: flex;
+        gap: 8px;
+        font-size: 11px;
+        color: var(--text-secondary);
+      }
+
+      .pr-repo {
+        color: var(--accent);
+      }
+
+      .pr-status {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .pr-badge {
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 10px;
+        font-weight: 500;
+      }
+
+      .pr-badge.pending {
+        background: rgba(210, 153, 34, 0.2);
+        color: var(--warning);
+      }
+
+      .pr-badge.reviewing {
+        background: rgba(88, 166, 255, 0.2);
+        color: var(--accent);
+      }
+
+      .pr-badge.reviewed {
+        background: rgba(63, 185, 80, 0.2);
+        color: var(--success);
+      }
+
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--text-secondary);
+        text-align: center;
+        padding: 32px;
+      }
+
+      .empty-state svg {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+      }
+
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+      }
+
+      .spinner {
+        width: 24px;
+        height: 24px;
+        border: 2px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .pr-actions {
+        display: flex;
+        gap: 4px;
+      }
+
+      .pr-action-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+      }
+
+      .pr-action-btn:hover {
+        background: var(--bg-hover);
+        color: var(--text-primary);
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 16px;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border);
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .section-header.my-review {
+        color: var(--warning);
+        background: rgba(210, 153, 34, 0.1);
+      }
+
+      .section-count {
+        background: var(--bg-primary);
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 10px;
+      }
+
+      .section-header.my-review .section-count {
+        background: rgba(210, 153, 34, 0.2);
+      }
+
+      .section-header.my-team {
+        color: var(--accent);
+        background: rgba(88, 166, 255, 0.1);
+      }
+
+      .section-header.my-team .section-count {
+        background: rgba(88, 166, 255, 0.2);
+      }
+
+      .pr-item.needs-review {
+        border-left: 3px solid var(--warning);
+      }
+
+      .pr-item.my-team {
+        border-left: 3px solid var(--accent);
+      }
+
+      /* Reviewers */
+      .pr-reviewers {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 4px;
+        flex-wrap: wrap;
+      }
+
+      .pr-reviewer-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        padding: 1px 6px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 10px;
+        color: var(--text-secondary);
+      }
+
+      .pr-reviewer-tag.team {
+        background: rgba(88, 166, 255, 0.1);
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      /* Filters */
+      .filter-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+      }
+
+      .filter-bar.hidden {
+        display: none;
+      }
+
+      .filter-toggle {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 8px;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-size: 11px;
+      }
+
+      .filter-toggle:hover {
+        background: var(--bg-hover);
+        color: var(--text-primary);
+      }
+
+      .filter-toggle.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: white;
+      }
+
+      .filter-select {
+        padding: 4px 8px;
+        background: var(--bg-primary);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        color: var(--text-primary);
+        font-size: 11px;
+        cursor: pointer;
+        min-width: 120px;
+      }
+
+      .filter-select:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+
+      .filter-label {
+        font-size: 11px;
+        color: var(--text-secondary);
+      }
+
+      .filter-clear {
+        padding: 4px 8px;
+        background: transparent;
+        border: none;
+        color: var(--accent);
+        cursor: pointer;
+        font-size: 11px;
+      }
+
+      .filter-clear:hover {
+        text-decoration: underline;
+      }
+
+      .filter-count {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-left: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <span class="header-title">Pull Requests</span>
+        <div class="header-actions">
+          <button class="btn" id="refreshBtn" title="Refresh">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+              <path
+                d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"
+              />
+            </svg>
+          </button>
+          <button class="btn" id="settingsBtn" title="Settings">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path
+                d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"
+              />
+              <path
+                d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"
+              />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="status-bar">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Connecting...</span>
+      </div>
+
+      <div class="filter-bar" id="filterBar">
+        <span class="filter-label">Filter:</span>
+        <select class="filter-select" id="filterRepo">
+          <option value="">All Repos</option>
+        </select>
+        <select class="filter-select" id="filterReviewer">
+          <option value="">All Reviewers</option>
+        </select>
+        <select class="filter-select" id="filterStatus">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="reviewing">Reviewing</option>
+          <option value="reviewed">Reviewed</option>
+        </select>
+        <select class="filter-select" id="sortBy" style="min-width: 100px">
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+        </select>
+        <button class="filter-clear" id="filterClear">Clear</button>
+        <span class="filter-count" id="filterCount"></span>
+      </div>
+
+      <div class="pr-list" id="prList">
+        <div class="loading">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = 'http://localhost:3847'
+      let isConnected = false
+      let retryCount = 0
+      const MAX_RETRIES = 3
+
+      // Filter state
+      let allPRData = null
+      let currentFilters = {
+        repo: '',
+        reviewer: '',
+        status: '',
+        sortBy: 'newest',
+      }
+
+      async function fetchPRs() {
+        try {
+          const response = await fetch(`${API_BASE}/api/prs`)
+          if (!response.ok) throw new Error('API error')
+          const data = await response.json()
+          allPRData = data
+          updateFilterOptions(data.filters)
+          renderPRList(data)
+          isConnected = true
+          retryCount = 0
+          return true
+        } catch (error) {
+          console.error('Failed to fetch PRs:', error)
+          retryCount++
+          if (retryCount >= MAX_RETRIES) {
+            isConnected = false
+            showError('Unable to connect to server')
+          }
+          return false
+        }
+      }
+
+      function updateFilterOptions(filters) {
+        if (!filters) return
+
+        const repoSelect = document.getElementById('filterRepo')
+        const reviewerSelect = document.getElementById('filterReviewer')
+
+        // Update repo options
+        const currentRepo = repoSelect.value
+        repoSelect.innerHTML = '<option value="">All Repos</option>'
+        filters.repositories.forEach((repo) => {
+          const opt = document.createElement('option')
+          opt.value = repo
+          opt.textContent = repo.split('/')[1] || repo // Show only repo name
+          repoSelect.appendChild(opt)
+        })
+        repoSelect.value = currentRepo
+
+        // Update reviewer options (combine users and teams)
+        const currentReviewer = reviewerSelect.value
+        reviewerSelect.innerHTML = '<option value="">All Reviewers</option>'
+        filters.reviewers.forEach((reviewer) => {
+          const opt = document.createElement('option')
+          opt.value = reviewer
+          opt.textContent = `@${reviewer}`
+          reviewerSelect.appendChild(opt)
+        })
+        filters.teams.forEach((team) => {
+          const opt = document.createElement('option')
+          opt.value = `team:${team}`
+          opt.textContent = `Team: ${team}`
+          reviewerSelect.appendChild(opt)
+        })
+        reviewerSelect.value = currentReviewer
+      }
+
+      function applyFilters(data) {
+        let myReview = [...(data.myReview || [])]
+        let myTeam = [...(data.myTeam || [])]
+        let other = [...(data.other || [])]
+
+        // Apply repo filter
+        if (currentFilters.repo) {
+          myReview = myReview.filter((pr) => pr.repository === currentFilters.repo)
+          myTeam = myTeam.filter((pr) => pr.repository === currentFilters.repo)
+          other = other.filter((pr) => pr.repository === currentFilters.repo)
+        }
+
+        // Apply reviewer filter
+        if (currentFilters.reviewer) {
+          const isTeam = currentFilters.reviewer.startsWith('team:')
+          const value = isTeam ? currentFilters.reviewer.slice(5) : currentFilters.reviewer
+
+          if (isTeam) {
+            myReview = myReview.filter((pr) => pr.requestedTeams.includes(value))
+            myTeam = myTeam.filter((pr) => pr.requestedTeams.includes(value))
+            other = other.filter((pr) => pr.requestedTeams.includes(value))
+          } else {
+            myReview = myReview.filter((pr) => pr.requestedReviewers.includes(value))
+            myTeam = myTeam.filter((pr) => pr.requestedReviewers.includes(value))
+            other = other.filter((pr) => pr.requestedReviewers.includes(value))
+          }
+        }
+
+        // Apply status filter
+        if (currentFilters.status) {
+          myReview = myReview.filter((pr) => pr.reviewStatus === currentFilters.status)
+          myTeam = myTeam.filter((pr) => pr.reviewStatus === currentFilters.status)
+          other = other.filter((pr) => pr.reviewStatus === currentFilters.status)
+        }
+
+        // Apply sorting
+        const sortFn =
+          currentFilters.sortBy === 'oldest'
+            ? (a, b) => new Date(a.updatedAt) - new Date(b.updatedAt)
+            : (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+
+        myReview.sort(sortFn)
+        myTeam.sort(sortFn)
+        other.sort(sortFn)
+
+        return { myReview, myTeam, other }
+      }
+
+      function updateFilterCount(filtered, total) {
+        const countEl = document.getElementById('filterCount')
+        const hasFilters = currentFilters.repo || currentFilters.reviewer || currentFilters.status
+
+        if (hasFilters) {
+          countEl.textContent = `Showing ${filtered} of ${total}`
+        } else {
+          countEl.textContent = ''
+        }
+      }
+
+      async function fetchStatus() {
+        try {
+          const response = await fetch(`${API_BASE}/api/status`)
+          if (!response.ok) throw new Error('API error')
+          const data = await response.json()
+          updateStatusBar(data)
+          isConnected = true
+        } catch (error) {
+          console.error('Failed to fetch status:', error)
+          updateStatusBar(null)
+        }
+      }
+
+      function updateStatusBar(status) {
+        const dot = document.getElementById('statusDot')
+        const text = document.getElementById('statusText')
+
+        if (!status) {
+          dot.classList.add('inactive')
+          text.textContent = 'Disconnected'
+          return
+        }
+
+        dot.classList.toggle('inactive', !status.polling.active)
+
+        const pollStatus = status.polling.active ? 'Active' : 'Idle'
+        const lastPoll = status.polling.lastPoll
+          ? formatRelativeTime(new Date(status.polling.lastPoll))
+          : 'Never'
+        const prCount = status.prs.total
+        const newCount = status.prs.new
+
+        let statusText = `${pollStatus}`
+        if (status.polling.lastPoll) {
+          statusText += ` | Updated ${lastPoll}`
+        }
+        if (prCount > 0) {
+          statusText += ` | ${prCount} PR${prCount !== 1 ? 's' : ''}`
+          if (newCount > 0) {
+            statusText += ` (${newCount} new)`
+          }
+        }
+
+        text.textContent = statusText
+      }
+
+      function showError(message) {
+        const container = document.getElementById('prList')
+        container.innerHTML = `
+        <div class="empty-state">
+          <svg viewBox="0 0 16 16" fill="currentColor" style="color: var(--error);">
+            <path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm9 3a1 1 0 11-2 0 1 1 0 012 0zm-.25-6.25a.75.75 0 00-1.5 0v3.5a.75.75 0 001.5 0v-3.5z"/>
+          </svg>
+          <p>${message}</p>
+          <button class="btn" style="margin-top: 12px;" onclick="retryConnection()">Retry</button>
+        </div>
+      `
+      }
+
+      function retryConnection() {
+        retryCount = 0
+        showLoading()
+        fetchPRs()
+        fetchStatus()
+      }
+
+      function showLoading() {
+        const container = document.getElementById('prList')
+        container.innerHTML = `
+        <div class="loading">
+          <div class="spinner"></div>
+        </div>
+      `
+      }
+
+      function renderPRList(data) {
+        const container = document.getElementById('prList')
+
+        // Apply filters
+        const filtered = applyFilters(data)
+        const myReview = filtered.myReview
+        const myTeam = filtered.myTeam
+        const other = filtered.other
+        const totalFiltered = myReview.length + myTeam.length + other.length
+        const totalAll =
+          (data.myReview?.length || 0) + (data.myTeam?.length || 0) + (data.other?.length || 0)
+
+        updateFilterCount(totalFiltered, totalAll)
+
+        if (totalAll === 0) {
+          container.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 16 16" fill="currentColor">
+              <path d="M7.177 3.073L9.573.677A.25.25 0 0110 .854v4.792a.25.25 0 01-.427.177L7.177 3.427a.25.25 0 010-.354zM3.75 2.5a.75.75 0 100 1.5.75.75 0 000-1.5zm-2.25.75a2.25 2.25 0 113 2.122v5.256a2.251 2.251 0 11-1.5 0V5.372A2.25 2.25 0 011.5 3.25zM11 2.5h-1V4h1a1 1 0 011 1v5.628a2.251 2.251 0 101.5 0V5A2.5 2.5 0 0011 2.5zm1 10.25a.75.75 0 111.5 0 .75.75 0 01-1.5 0zM3.75 12a.75.75 0 100 1.5.75.75 0 000-1.5z"/>
+            </svg>
+            <p>No open PRs found</p>
+            <p style="font-size: 11px; margin-top: 8px; color: var(--text-secondary);">
+              Open PRs in your organization will appear here
+            </p>
+          </div>
+        `
+          return
+        }
+
+        if (totalFiltered === 0) {
+          container.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 16 16" fill="currentColor">
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+            </svg>
+            <p>No PRs match your filters</p>
+            <button class="btn" style="margin-top: 12px;" onclick="clearFilters()">Clear Filters</button>
+          </div>
+        `
+          return
+        }
+
+        let html = ''
+
+        // My Review section
+        if (myReview.length > 0) {
+          html += `
+          <div class="section-header my-review">
+            <span>Needs My Review</span>
+            <span class="section-count">${myReview.length}</span>
+          </div>
+        `
+          html += myReview.map((pr) => renderPRItem(pr, true)).join('')
+        }
+
+        // My Team section
+        if (myTeam.length > 0) {
+          html += `
+          <div class="section-header my-team">
+            <span>My Team</span>
+            <span class="section-count">${myTeam.length}</span>
+          </div>
+        `
+          html += myTeam.map((pr) => renderPRItem(pr, false, true)).join('')
+        }
+
+        // Other PRs section
+        if (other.length > 0) {
+          html += `
+          <div class="section-header">
+            <span>All Open PRs</span>
+            <span class="section-count">${other.length}</span>
+          </div>
+        `
+          html += other.map((pr) => renderPRItem(pr, false)).join('')
+        }
+
+        container.innerHTML = html
+
+        // Add click handlers
+        container.querySelectorAll('.pr-item').forEach((item) => {
+          item.addEventListener('click', () => {
+            const id = item.dataset.id
+            if (id) {
+              openPRDetail(id)
+            }
+          })
+        })
+      }
+
+      function renderPRItem(pr, needsReview, isMyTeam = false) {
+        const classes = ['pr-item']
+        if (pr.hasNewActivity) classes.push('new')
+        if (needsReview) classes.push('needs-review')
+        if (isMyTeam) classes.push('my-team')
+
+        // Build reviewers tags
+        let reviewersTags = ''
+        if (pr.requestedReviewers?.length > 0 || pr.requestedTeams?.length > 0) {
+          const userTags = (pr.requestedReviewers || [])
+            .map((r) => `<span class="pr-reviewer-tag">@${escapeHtml(r)}</span>`)
+            .join('')
+          const teamTags = (pr.requestedTeams || [])
+            .map(
+              (t) => `<span class="pr-reviewer-tag team">👥 ${escapeHtml(formatTeamName(t))}</span>`
+            )
+            .join('')
+          reviewersTags = `<div class="pr-reviewers">${userTags}${teamTags}</div>`
+        }
+
+        return `
+        <div class="${classes.join(' ')}" data-id="${pr.id}">
+          <img class="pr-avatar" src="${pr.authorAvatar || ''}" alt="${pr.author}" onerror="this.style.display='none'" />
+          <div class="pr-content">
+            <div class="pr-title">#${pr.number}: ${escapeHtml(pr.title)}</div>
+            <div class="pr-meta">
+              <span class="pr-repo">${pr.repository}</span>
+              <span>by ${pr.author}</span>
+              <span>${formatRelativeTime(new Date(pr.updatedAt))}</span>
+            </div>
+            ${reviewersTags}
+          </div>
+          <div class="pr-status">
+            <span class="pr-badge ${pr.reviewStatus}">${pr.reviewStatus}</span>
+          </div>
+        </div>
+      `
+      }
+
+      function openPRDetail(prId) {
+        // Mark as seen
+        fetch(`${API_BASE}/api/prs/${encodeURIComponent(prId)}/seen`, { method: 'POST' })
+
+        // Open PR detail window via Electron IPC
+        if (window.electronAPI?.openPRDetail) {
+          window.electronAPI.openPRDetail(prId)
+        } else {
+          // Fallback for browser dev mode
+          window.open(
+            `pr-detail.html?id=${encodeURIComponent(prId)}`,
+            '_blank',
+            'width=900,height=700'
+          )
+        }
+
+        // Refresh to update the UI
+        setTimeout(() => fetchPRs(), 500)
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div')
+        div.textContent = text
+        return div.innerHTML
+      }
+
+      function formatRelativeTime(date) {
+        const now = new Date()
+        const diff = now - date
+        const seconds = Math.floor(diff / 1000)
+        const minutes = Math.floor(seconds / 60)
+        const hours = Math.floor(minutes / 60)
+        const days = Math.floor(hours / 24)
+
+        if (days > 0) return `${days}d ago`
+        if (hours > 0) return `${hours}h ago`
+        if (minutes > 0) return `${minutes}m ago`
+        return 'just now'
+      }
+
+      // Format team slug for display (e.g., "backend-team" → "Backend Team")
+      function formatTeamName(slug) {
+        if (!slug) return ''
+        return slug
+          .split('-')
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+      }
+
+      // Event handlers
+      document.getElementById('refreshBtn').addEventListener('click', () => {
+        showLoading()
+        fetchPRs()
+        fetchStatus()
+      })
+
+      document.getElementById('settingsBtn').addEventListener('click', () => {
+        window.location.href = 'settings.html'
+      })
+
+      // Filter event handlers
+      document.getElementById('filterRepo').addEventListener('change', (e) => {
+        currentFilters.repo = e.target.value
+        if (allPRData) renderPRList(allPRData)
+      })
+
+      document.getElementById('filterReviewer').addEventListener('change', (e) => {
+        currentFilters.reviewer = e.target.value
+        if (allPRData) renderPRList(allPRData)
+      })
+
+      document.getElementById('filterStatus').addEventListener('change', (e) => {
+        currentFilters.status = e.target.value
+        if (allPRData) renderPRList(allPRData)
+      })
+
+      document.getElementById('filterClear').addEventListener('click', clearFilters)
+
+      document.getElementById('sortBy').addEventListener('change', (e) => {
+        currentFilters.sortBy = e.target.value
+        if (allPRData) renderPRList(allPRData)
+      })
+
+      function clearFilters() {
+        currentFilters = { repo: '', reviewer: '', status: '', sortBy: 'newest' }
+        document.getElementById('filterRepo').value = ''
+        document.getElementById('filterReviewer').value = ''
+        document.getElementById('filterStatus').value = ''
+        document.getElementById('sortBy').value = 'newest'
+        if (allPRData) renderPRList(allPRData)
+      }
+
+      // Initial load with retry
+      async function init() {
+        await fetchStatus()
+        const success = await fetchPRs()
+
+        // If first fetch failed or returned empty, retry after a delay
+        // This handles the case where the window preloads before polling starts
+        if (!success || (allPRData && allPRData.total === 0)) {
+          setTimeout(async () => {
+            console.log('[Init] Retrying fetch after delay...')
+            await fetchStatus()
+            await fetchPRs()
+          }, 2000)
+        }
+      }
+
+      init()
+
+      // Refresh when window becomes visible (handles preload timing issue)
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          console.log('[Visibility] Window visible, refreshing...')
+          fetchPRs()
+          fetchStatus()
+        }
+      })
+
+      // Also refresh on window focus (Electron specific)
+      window.addEventListener('focus', () => {
+        console.log('[Focus] Window focused, refreshing...')
+        fetchPRs()
+        fetchStatus()
+      })
+
+      // Poll for updates every 30 seconds
+      setInterval(() => {
+        fetchPRs()
+        fetchStatus()
+      }, 30000)
+    </script>
+  </body>
+</html>

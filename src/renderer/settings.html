@@ -1,0 +1,1308 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:*"
+    />
+    <title>Settings - PRPal</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2d2d2d;
+        --bg-hover: #3d3d3d;
+        --text-primary: #ffffff;
+        --text-secondary: #a0a0a0;
+        --accent: #58a6ff;
+        --success: #3fb950;
+        --warning: #d29922;
+        --error: #f85149;
+        --border: #404040;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .container {
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      h1 {
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .close-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 4px;
+      }
+
+      .close-btn:hover {
+        color: var(--text-primary);
+      }
+
+      .section {
+        margin-bottom: 24px;
+      }
+
+      .section-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: var(--text-primary);
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--text-secondary);
+        font-size: 12px;
+      }
+
+      input[type='text'],
+      input[type='password'],
+      input[type='number'],
+      select,
+      textarea {
+        width: 100%;
+        padding: 8px 12px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text-primary);
+        font-size: 13px;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+
+      textarea {
+        min-height: 100px;
+        resize: vertical;
+        font-family: monospace;
+      }
+
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      input[type='checkbox'] {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--accent);
+      }
+
+      .checkbox-label {
+        color: var(--text-primary);
+        font-size: 13px;
+      }
+
+      .btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+      }
+
+      .btn:hover {
+        background: var(--bg-hover);
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .btn-primary:hover {
+        opacity: 0.9;
+      }
+
+      .btn-danger {
+        color: var(--error);
+        border-color: var(--error);
+      }
+
+      .btn-danger:hover {
+        background: rgba(248, 81, 73, 0.1);
+      }
+
+      .agent-list {
+        margin-top: 12px;
+      }
+
+      .agent-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        margin-bottom: 8px;
+      }
+
+      .agent-info {
+        flex: 1;
+      }
+
+      .agent-name {
+        font-weight: 500;
+        margin-bottom: 2px;
+      }
+
+      .agent-desc {
+        font-size: 11px;
+        color: var(--text-secondary);
+      }
+
+      .agent-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .badge {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        background: rgba(88, 166, 255, 0.2);
+        color: var(--accent);
+        margin-left: 8px;
+      }
+
+      .footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+      }
+
+      .tabs {
+        display: flex;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 20px;
+      }
+
+      .tab {
+        padding: 8px 16px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+      }
+
+      .tab:hover {
+        color: var(--text-primary);
+      }
+
+      .tab.active {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .help-text {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+      }
+
+      .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 4px;
+      }
+
+      .skill-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+      }
+
+      .skill-item:hover {
+        background: var(--bg-hover);
+      }
+
+      .skill-item.selected {
+        border-color: var(--accent);
+        background: rgba(88, 166, 255, 0.1);
+      }
+
+      .skill-item input[type='checkbox'] {
+        width: 14px;
+        height: 14px;
+        margin: 0;
+      }
+
+      .skill-icon {
+        font-size: 14px;
+      }
+
+      .skill-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .skill-name {
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .skill-custom-badge {
+        font-size: 9px;
+        padding: 1px 4px;
+        border-radius: 4px;
+        background: var(--warning);
+        color: #000;
+        margin-left: 4px;
+      }
+
+      .skills-section-title {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin: 12px 0 8px 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .skills-section-title:first-child {
+        margin-top: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <button class="close-btn" onclick="goBack()" title="Back">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M7.78 12.53a.75.75 0 01-1.06 0L2.47 8.28a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 1.06L4.81 7h7.44a.75.75 0 010 1.5H4.81l2.97 2.97a.75.75 0 010 1.06z"
+              />
+            </svg>
+          </button>
+          <h1>Settings</h1>
+        </div>
+      </header>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="general">General</div>
+        <div class="tab" data-tab="agents">Review Agents</div>
+        <div class="tab" data-tab="notifications">Notifications</div>
+      </div>
+
+      <div id="generalTab" class="tab-content active">
+        <div class="section">
+          <h3 class="section-title">GitHub Configuration</h3>
+
+          <div class="form-group">
+            <label for="githubPat">Personal Access Token</label>
+            <input type="password" id="githubPat" placeholder="ghp_xxxxxxxxxxxx" />
+            <p class="help-text">Token requires repo and read:org scopes</p>
+          </div>
+
+          <div class="form-group">
+            <label for="githubUsername">Username</label>
+            <input type="text" id="githubUsername" placeholder="your-username" />
+          </div>
+
+          <div class="form-group">
+            <label for="githubOrg">Organization</label>
+            <input type="text" id="githubOrg" placeholder="OsomePteLtd" />
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">Polling</h3>
+
+          <div class="form-group">
+            <label for="pollInterval">Check interval (minutes)</label>
+            <input type="number" id="pollInterval" min="1" max="60" value="5" />
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">OpenCode Integration</h3>
+
+          <div class="form-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="opencodeEnabled" checked />
+              <span class="checkbox-label">Enable AI-powered reviews</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="autoReview" checked />
+              <span class="checkbox-label">Auto-review new PRs</span>
+            </div>
+            <p class="help-text">Reviews will require confirmation before posting</p>
+          </div>
+
+          <div class="form-group">
+            <label for="opencodeModel">Model</label>
+            <div style="display: flex; gap: 8px">
+              <select id="opencodeModel" style="flex: 1">
+                <option value="">Loading models...</option>
+              </select>
+              <button
+                class="btn"
+                id="refreshModelsBtn"
+                title="Refresh models list"
+                style="padding: 8px 12px"
+              >
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <path
+                    fill-rule="evenodd"
+                    d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"
+                  />
+                  <path
+                    d="M8 4.466V.534a.25.25 0 01.41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 018 4.466z"
+                  />
+                </svg>
+              </button>
+            </div>
+            <p class="help-text" id="modelInfo"></p>
+          </div>
+
+          <div class="form-group">
+            <label>Filter by Provider</label>
+            <div
+              id="providerFilters"
+              style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px"
+            >
+              <!-- Populated by JavaScript -->
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="skillsFolder">Custom Skills Folder</label>
+            <input type="text" id="skillsFolder" placeholder="~/skills" />
+            <p class="help-text">Folder containing .md files with custom skill definitions</p>
+          </div>
+
+          <div class="form-group">
+            <label for="memoriesFolder">Memories Folder</label>
+            <input type="text" id="memoriesFolder" placeholder="~/memories" />
+            <p class="help-text">Folder containing .md files with context/memories for reviews</p>
+          </div>
+
+          <button class="btn" id="reloadSkillsBtn" style="margin-top: 8px">
+            Reload Skills & Memories
+          </button>
+        </div>
+      </div>
+
+      <div id="agentsTab" class="tab-content">
+        <div class="section">
+          <h3 class="section-title">Review Agents</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 12px">
+            Agents define how PRs are reviewed. Create custom agents for specific review styles.
+          </p>
+
+          <div class="agent-list" id="agentList">
+            <!-- Populated by JavaScript -->
+          </div>
+
+          <button class="btn" id="addAgentBtn" style="margin-top: 12px">+ Add Agent</button>
+        </div>
+
+        <div id="agentEditor" style="display: none">
+          <div class="section">
+            <h3 class="section-title" id="agentEditorTitle">New Agent</h3>
+
+            <div class="form-group">
+              <label for="agentName">Name</label>
+              <input type="text" id="agentName" placeholder="My Custom Agent" />
+            </div>
+
+            <div class="form-group">
+              <label for="agentDesc">Description</label>
+              <input type="text" id="agentDesc" placeholder="What this agent focuses on" />
+            </div>
+
+            <div class="form-group">
+              <label for="agentModel">Model</label>
+              <select id="agentModel">
+                <option value="">Use default model</option>
+              </select>
+              <p class="help-text">Leave empty to use the model from General settings</p>
+            </div>
+
+            <div class="form-group">
+              <label for="agentTemp">Temperature (0-1)</label>
+              <input type="number" id="agentTemp" min="0" max="1" step="0.1" value="0.1" />
+              <p class="help-text">Lower = more focused, Higher = more creative</p>
+            </div>
+
+            <div class="form-group">
+              <label for="agentPrompt">System Prompt</label>
+              <textarea
+                id="agentPrompt"
+                style="min-height: 200px"
+                placeholder="You are a code reviewer..."
+              ></textarea>
+              <p class="help-text">
+                Define how the agent should review code. Must output JSON format.
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label>Skills</label>
+              <p class="help-text" style="margin-bottom: 8px">
+                Select focus areas for this agent's reviews
+              </p>
+              <div id="skillsSelector" class="skills-grid">
+                <!-- Populated by JavaScript -->
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 16px">
+              <button class="btn btn-primary" id="saveAgentBtn">Save Agent</button>
+              <button class="btn" id="cancelAgentBtn">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="notificationsTab" class="tab-content">
+        <div class="section">
+          <h3 class="section-title">Notifications</h3>
+
+          <div class="form-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="notifyEnabled" checked />
+              <span class="checkbox-label">Enable notifications</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="notifySound" checked />
+              <span class="checkbox-label">Play sound</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">Review Format</h3>
+
+          <div class="form-group">
+            <label for="reviewStyle">Style</label>
+            <select id="reviewStyle">
+              <option value="minimal">Minimal</option>
+              <option value="standard" selected>Standard</option>
+              <option value="detailed">Detailed</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="reviewAttribution">Attribution</label>
+            <select id="reviewAttribution">
+              <option value="none">None</option>
+              <option value="subtle" selected>Subtle</option>
+              <option value="full">Full</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <button class="btn" onclick="window.close()">Cancel</button>
+        <button class="btn btn-primary" id="saveBtn">Save Changes</button>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = 'http://localhost:3847'
+      let currentSettings = null
+      let allModels = []
+      let selectedProvider = null
+      let allAgents = []
+      let allSkills = []
+      let editingAgentId = null
+      let selectedSkills = []
+
+      // Tab switching
+      document.querySelectorAll('.tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'))
+          document.querySelectorAll('.tab-content').forEach((c) => c.classList.remove('active'))
+
+          tab.classList.add('active')
+          document.getElementById(tab.dataset.tab + 'Tab').classList.add('active')
+        })
+      })
+
+      // Load settings
+      async function loadSettings() {
+        try {
+          const response = await fetch(`${API_BASE}/api/settings`)
+          currentSettings = await response.json()
+          populateForm(currentSettings)
+        } catch (error) {
+          console.error('Failed to load settings:', error)
+        }
+      }
+
+      function populateForm(settings) {
+        // GitHub
+        document.getElementById('githubPat').placeholder = settings.github.pat || 'ghp_xxxxxxxxxxxx'
+        document.getElementById('githubUsername').value = settings.github.username || ''
+        document.getElementById('githubOrg').value = settings.github.org || ''
+
+        // Polling
+        document.getElementById('pollInterval').value = Math.round(
+          (settings.polling?.intervalMs || 300000) / 60000
+        )
+
+        // OpenCode
+        document.getElementById('opencodeEnabled').checked = settings.opencode?.enabled !== false
+        document.getElementById('autoReview').checked = settings.opencode?.autoReview !== false
+        if (settings.opencode?.model) {
+          document.getElementById('opencodeModel').value = settings.opencode.model
+        }
+        document.getElementById('skillsFolder').value = settings.opencode?.skillsFolder || ''
+        document.getElementById('memoriesFolder').value = settings.opencode?.memoriesFolder || ''
+
+        // Notifications
+        document.getElementById('notifyEnabled').checked = settings.notification?.enabled !== false
+        document.getElementById('notifySound').checked = settings.notification?.sound !== false
+
+        // Review format
+        if (settings.reviewFormat?.style) {
+          document.getElementById('reviewStyle').value = settings.reviewFormat.style
+        }
+        if (settings.reviewFormat?.attribution) {
+          document.getElementById('reviewAttribution').value = settings.reviewFormat.attribution
+        }
+      }
+
+      // Load agents
+      async function loadAgents() {
+        const agentList = document.getElementById('agentList')
+        agentList.innerHTML = '<div style="color: var(--text-secondary);">Loading agents...</div>'
+
+        try {
+          const response = await fetch(`${API_BASE}/api/agents`)
+          const data = await response.json()
+          allAgents = data.agents || []
+          const defaultAgentId = data.defaultAgentId
+          console.log(
+            '[Settings] Loaded agents:',
+            allAgents.map((a) => ({ id: a.id, skills: a.skills }))
+          )
+
+          if (allAgents.length === 0) {
+            agentList.innerHTML = '<div style="color: var(--text-secondary);">No agents found</div>'
+            return
+          }
+
+          agentList.innerHTML = allAgents
+            .map(
+              (agent) => `
+          <div class="agent-item" data-id="${agent.id}">
+            <div class="agent-info">
+              <div class="agent-name">
+                ${escapeHtml(agent.name)}
+                ${agent.id === defaultAgentId ? '<span class="badge">Default</span>' : ''}
+                ${agent.isBuiltIn ? '<span class="badge" style="background: var(--bg-hover);">Built-in</span>' : ''}
+              </div>
+              <div class="agent-desc">${escapeHtml(agent.description)}</div>
+              <div class="agent-desc" style="margin-top: 4px;">
+                Model: ${escapeHtml(agent.model)}
+                ${agent.skills?.length ? ` · ${agent.skills.length} skill${agent.skills.length > 1 ? 's' : ''}` : ''}
+              </div>
+            </div>
+            <div class="agent-actions">
+              ${
+                agent.id !== defaultAgentId
+                  ? `
+                <button class="btn" onclick="setDefaultAgent('${agent.id}')" title="Set as default">
+                  Set Default
+                </button>
+              `
+                  : ''
+              }
+              <button class="btn" onclick="editAgent('${agent.id}')">Edit</button>
+              ${
+                !agent.isBuiltIn
+                  ? `
+                <button class="btn btn-danger" onclick="deleteAgent('${agent.id}')" title="Delete">
+                  Delete
+                </button>
+              `
+                  : ''
+              }
+            </div>
+          </div>
+        `
+            )
+            .join('')
+        } catch (error) {
+          console.error('Failed to load agents:', error)
+          agentList.innerHTML = '<div style="color: var(--error);">Failed to load agents</div>'
+        }
+      }
+
+      async function editAgent(id) {
+        editingAgentId = id
+        const agent = allAgents.find((a) => a.id === id)
+
+        if (!agent) {
+          showToast('Agent not found', true)
+          return
+        }
+
+        console.log('[Settings] Editing agent:', agent.id, 'skills:', agent.skills)
+
+        // Ensure skills are loaded before showing the editor
+        if (allSkills.length === 0) {
+          await loadSkills()
+        }
+
+        document.getElementById('agentEditorTitle').textContent = 'Edit Agent'
+        document.getElementById('agentName').value = agent.name
+        document.getElementById('agentDesc').value = agent.description
+        document.getElementById('agentPrompt').value = agent.prompt
+        document.getElementById('agentTemp').value = agent.temperature
+
+        // Populate model dropdown
+        populateAgentModelDropdown(agent.model)
+
+        // Populate skills - make a copy of the array
+        selectedSkills = [...(agent.skills || [])]
+        console.log('[Settings] Selected skills:', selectedSkills)
+        renderSkillsSelector()
+
+        // Disable name field for built-in agents
+        document.getElementById('agentName').disabled = agent.isBuiltIn
+
+        document.getElementById('agentEditor').style.display = 'block'
+        document.querySelector('#agentsTab .section:first-child').style.display = 'none'
+      }
+
+      async function showAgentForm(isNew = true) {
+        editingAgentId = isNew ? null : editingAgentId
+
+        // Ensure skills are loaded before showing the editor
+        if (allSkills.length === 0) {
+          await loadSkills()
+        }
+
+        if (isNew) {
+          document.getElementById('agentEditorTitle').textContent = 'New Agent'
+          document.getElementById('agentName').value = ''
+          document.getElementById('agentDesc').value = ''
+          document.getElementById('agentPrompt').value = getDefaultPrompt()
+          document.getElementById('agentTemp').value = '0.1'
+          document.getElementById('agentName').disabled = false
+          populateAgentModelDropdown('')
+          selectedSkills = []
+          renderSkillsSelector()
+        }
+
+        document.getElementById('agentEditor').style.display = 'block'
+        document.querySelector('#agentsTab .section:first-child').style.display = 'none'
+      }
+
+      function populateAgentModelDropdown(selectedModel) {
+        const select = document.getElementById('agentModel')
+        select.innerHTML = '<option value="">Use default model</option>'
+
+        // Group by provider
+        const grouped = {}
+        allModels.forEach((m) => {
+          if (!grouped[m.provider]) grouped[m.provider] = []
+          grouped[m.provider].push(m)
+        })
+
+        Object.keys(grouped)
+          .sort()
+          .forEach((provider) => {
+            const optgroup = document.createElement('optgroup')
+            optgroup.label = provider.charAt(0).toUpperCase() + provider.slice(1)
+
+            grouped[provider].forEach((model) => {
+              const option = document.createElement('option')
+              option.value = model.id
+              option.textContent = model.name
+              if (model.hasReasoning) option.textContent += ' (Reasoning)'
+              optgroup.appendChild(option)
+            })
+
+            select.appendChild(optgroup)
+          })
+
+        if (selectedModel) {
+          select.value = selectedModel
+        }
+      }
+
+      function hideAgentForm() {
+        document.getElementById('agentEditor').style.display = 'none'
+        document.querySelector('#agentsTab .section:first-child').style.display = 'block'
+        editingAgentId = null
+      }
+
+      async function saveAgent() {
+        const name = document.getElementById('agentName').value.trim()
+        const description = document.getElementById('agentDesc').value.trim()
+        const prompt = document.getElementById('agentPrompt').value.trim()
+        const temperature = parseFloat(document.getElementById('agentTemp').value) || 0.1
+
+        if (!name || !prompt) {
+          showToast('Name and prompt are required', true)
+          return
+        }
+
+        // Get model from agent editor, fallback to general settings, fallback to default
+        const agentModel = document.getElementById('agentModel').value
+        const generalModel = document.getElementById('opencodeModel').value
+        const model = agentModel || generalModel || 'anthropic/claude-sonnet-4-20250514'
+
+        const agentData = { name, description, prompt, temperature, model, skills: selectedSkills }
+        console.log('[Settings] Saving agent:', agentData)
+
+        try {
+          let response
+          if (editingAgentId) {
+            // Update existing agent
+            response = await fetch(`${API_BASE}/api/agents/${editingAgentId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(agentData),
+            })
+          } else {
+            // Create new agent
+            response = await fetch(`${API_BASE}/api/agents`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(agentData),
+            })
+          }
+
+          if (response.ok) {
+            const savedAgent = await response.json()
+            console.log('[Settings] Agent saved:', savedAgent)
+            showToast(editingAgentId ? 'Agent updated!' : 'Agent created!')
+            hideAgentForm()
+            await loadAgents()
+          } else {
+            const error = await response.json()
+            showToast(error.error || 'Failed to save agent', true)
+          }
+        } catch (error) {
+          console.error('Failed to save agent:', error)
+          showToast('Failed to save agent', true)
+        }
+      }
+
+      async function deleteAgent(id) {
+        if (!confirm('Are you sure you want to delete this agent?')) return
+
+        try {
+          const response = await fetch(`${API_BASE}/api/agents/${id}`, {
+            method: 'DELETE',
+          })
+
+          if (response.ok) {
+            showToast('Agent deleted')
+            loadAgents()
+          } else {
+            const error = await response.json()
+            showToast(error.error || 'Failed to delete agent', true)
+          }
+        } catch (error) {
+          console.error('Failed to delete agent:', error)
+          showToast('Failed to delete agent', true)
+        }
+      }
+
+      async function setDefaultAgent(id) {
+        try {
+          const response = await fetch(`${API_BASE}/api/agents/${id}/default`, {
+            method: 'POST',
+          })
+
+          if (response.ok) {
+            showToast('Default agent updated')
+            loadAgents()
+          } else {
+            showToast('Failed to set default agent', true)
+          }
+        } catch (error) {
+          console.error('Failed to set default agent:', error)
+          showToast('Failed to set default agent', true)
+        }
+      }
+
+      function getDefaultPrompt() {
+        return `You are an expert code reviewer. Analyze the pull request and provide feedback.
+
+## Output Format
+Provide your review as JSON with this structure:
+{
+  "summary": "Brief overview of changes (2-3 sentences)",
+  "verdict": "approve" | "request_changes" | "comment",
+  "issues": [
+    {
+      "severity": "critical" | "warning" | "info",
+      "file": "path/to/file.ts",
+      "line": 42,
+      "message": "Description of the issue",
+      "suggestion": "How to fix (optional)"
+    }
+  ],
+  "suggestions": [
+    { "message": "Constructive improvement suggestion" }
+  ],
+  "positives": ["Things done well (optional)"]
+}
+
+Be constructive, specific, and provide code examples where helpful.`
+      }
+
+      function escapeHtml(text) {
+        if (!text) return ''
+        const div = document.createElement('div')
+        div.textContent = text
+        return div.innerHTML
+      }
+
+      document.getElementById('addAgentBtn').addEventListener('click', () => {
+        showAgentForm(true)
+      })
+
+      document.getElementById('cancelAgentBtn').addEventListener('click', () => {
+        hideAgentForm()
+      })
+
+      document.getElementById('saveAgentBtn').addEventListener('click', () => {
+        saveAgent()
+      })
+
+      document.getElementById('saveBtn').addEventListener('click', async () => {
+        const settings = {
+          polling: {
+            intervalMs: parseInt(document.getElementById('pollInterval').value) * 60000,
+          },
+          opencode: {
+            enabled: document.getElementById('opencodeEnabled').checked,
+            model: document.getElementById('opencodeModel').value,
+            autoReview: document.getElementById('autoReview').checked,
+            skillsFolder: document.getElementById('skillsFolder').value || undefined,
+            memoriesFolder: document.getElementById('memoriesFolder').value || undefined,
+          },
+          notification: {
+            enabled: document.getElementById('notifyEnabled').checked,
+            sound: document.getElementById('notifySound').checked,
+          },
+          reviewFormat: {
+            style: document.getElementById('reviewStyle').value,
+            attribution: document.getElementById('reviewAttribution').value,
+          },
+        }
+
+        // Only include GitHub settings if PAT was changed
+        const newPat = document.getElementById('githubPat').value
+        const newUsername = document.getElementById('githubUsername').value
+        const newOrg = document.getElementById('githubOrg').value
+
+        if (newPat && newPat !== '***configured***') {
+          settings.github = { pat: newPat, username: newUsername, org: newOrg }
+        } else if (newUsername || newOrg) {
+          // If only username/org changed, we need the existing PAT
+          // For now, require all three if any GitHub setting changes
+        }
+
+        try {
+          const response = await fetch(`${API_BASE}/api/settings`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(settings),
+          })
+
+          if (response.ok) {
+            showToast('Settings saved successfully!')
+            setTimeout(() => goBack(), 1000)
+          } else {
+            showToast('Failed to save settings', true)
+          }
+        } catch (error) {
+          console.error('Failed to save settings:', error)
+          showToast('Failed to save settings', true)
+        }
+      })
+
+      function goBack() {
+        window.location.href = 'index.html'
+      }
+
+      function showToast(message, isError = false) {
+        const toast = document.createElement('div')
+        toast.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 12px 24px;
+        background: ${isError ? 'var(--error)' : 'var(--success)'};
+        color: white;
+        border-radius: 6px;
+        font-size: 13px;
+        z-index: 1000;
+      `
+        toast.textContent = message
+        document.body.appendChild(toast)
+        setTimeout(() => toast.remove(), 3000)
+      }
+
+      // Load models from OpenCode
+      async function loadModels(refresh = false) {
+        const select = document.getElementById('opencodeModel')
+        const modelInfo = document.getElementById('modelInfo')
+        const providerFilters = document.getElementById('providerFilters')
+
+        select.innerHTML = '<option value="">Loading models...</option>'
+        modelInfo.textContent = 'Fetching available models...'
+
+        try {
+          const url = refresh ? `${API_BASE}/api/models/refresh` : `${API_BASE}/api/models`
+          const method = refresh ? 'POST' : 'GET'
+          const response = await fetch(url, { method })
+          const data = await response.json()
+
+          allModels = data.models || []
+          const providers = data.providers || []
+
+          // Render provider filter buttons
+          providerFilters.innerHTML = `
+          <button class="btn ${!selectedProvider ? 'btn-primary' : ''}" 
+                  onclick="filterByProvider(null)" 
+                  style="padding: 4px 10px; font-size: 11px;">
+            All
+          </button>
+          ${providers
+            .map(
+              (p) => `
+            <button class="btn ${selectedProvider === p ? 'btn-primary' : ''}" 
+                    onclick="filterByProvider('${p}')"
+                    style="padding: 4px 10px; font-size: 11px; text-transform: capitalize;">
+              ${p}
+            </button>
+          `
+            )
+            .join('')}
+        `
+
+          renderModels()
+          modelInfo.textContent = `${allModels.length} models available`
+
+          // Restore selected model
+          if (currentSettings?.opencode?.model) {
+            select.value = currentSettings.opencode.model
+            updateModelInfo(currentSettings.opencode.model)
+          }
+        } catch (error) {
+          console.error('Failed to load models:', error)
+          select.innerHTML = `
+          <option value="anthropic/claude-sonnet-4-5">Claude Sonnet 4.5</option>
+          <option value="anthropic/claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+          <option value="openai/gpt-4o">GPT-4o</option>
+        `
+          modelInfo.textContent = 'Failed to load models. Using defaults.'
+        }
+      }
+
+      function filterByProvider(provider) {
+        selectedProvider = provider
+        renderModels()
+
+        // Update button states
+        document.querySelectorAll('#providerFilters .btn').forEach((btn) => {
+          btn.classList.remove('btn-primary')
+        })
+        event.target.classList.add('btn-primary')
+      }
+
+      function renderModels() {
+        const select = document.getElementById('opencodeModel')
+        const currentValue = select.value
+
+        const filtered = selectedProvider
+          ? allModels.filter((m) => m.provider === selectedProvider)
+          : allModels
+
+        // Group by provider
+        const grouped = {}
+        filtered.forEach((m) => {
+          if (!grouped[m.provider]) grouped[m.provider] = []
+          grouped[m.provider].push(m)
+        })
+
+        select.innerHTML = ''
+
+        Object.keys(grouped)
+          .sort()
+          .forEach((provider) => {
+            const optgroup = document.createElement('optgroup')
+            optgroup.label = provider.charAt(0).toUpperCase() + provider.slice(1)
+
+            grouped[provider].forEach((model) => {
+              const option = document.createElement('option')
+              option.value = model.id
+              option.textContent = model.name
+              if (model.hasReasoning) option.textContent += ' (Reasoning)'
+              optgroup.appendChild(option)
+            })
+
+            select.appendChild(optgroup)
+          })
+
+        // Restore selection
+        if (currentValue && filtered.find((m) => m.id === currentValue)) {
+          select.value = currentValue
+        }
+      }
+
+      function updateModelInfo(modelId) {
+        const model = allModels.find((m) => m.id === modelId)
+        const modelInfo = document.getElementById('modelInfo')
+
+        if (model) {
+          const parts = []
+          if (model.contextLimit) parts.push(`${Math.round(model.contextLimit / 1000)}K context`)
+          if (model.hasReasoning) parts.push('Reasoning enabled')
+          modelInfo.textContent = parts.join(' · ') || ''
+        } else {
+          modelInfo.textContent = ''
+        }
+      }
+
+      document.getElementById('opencodeModel').addEventListener('change', (e) => {
+        updateModelInfo(e.target.value)
+      })
+
+      document.getElementById('refreshModelsBtn').addEventListener('click', () => {
+        loadModels(true)
+      })
+
+      // Load skills
+      async function loadSkills() {
+        try {
+          const response = await fetch(`${API_BASE}/api/skills`)
+          const data = await response.json()
+          allSkills = data.skills || []
+
+          // Update folder path displays if they exist
+          if (data.skillsFolder) {
+            const skillsFolderInput = document.getElementById('skillsFolder')
+            if (skillsFolderInput && !skillsFolderInput.value) {
+              skillsFolderInput.value = data.skillsFolder
+            }
+          }
+          if (data.memoriesFolder) {
+            const memoriesFolderInput = document.getElementById('memoriesFolder')
+            if (memoriesFolderInput && !memoriesFolderInput.value) {
+              memoriesFolderInput.value = data.memoriesFolder
+            }
+          }
+
+          // Update info text
+          const customCount = data.customSkillsCount || 0
+          const memoriesCount = data.memoriesCount || 0
+          const skillsFolderHelp = document.querySelector('#skillsFolder + .help-text')
+          const memoriesFolderHelp = document.querySelector('#memoriesFolder + .help-text')
+          if (skillsFolderHelp && customCount > 0) {
+            skillsFolderHelp.textContent = `${customCount} custom skill(s) loaded`
+          }
+          if (memoriesFolderHelp && memoriesCount > 0) {
+            memoriesFolderHelp.textContent = `${memoriesCount} memory file(s) loaded`
+          }
+
+          renderSkillsSelector()
+        } catch (error) {
+          console.error('Failed to load skills:', error)
+        }
+      }
+
+      // Reload skills when folder paths change
+      async function reloadSkillsFromFolders() {
+        const skillsFolder = document.getElementById('skillsFolder').value.trim() || undefined
+        const memoriesFolder = document.getElementById('memoriesFolder').value.trim() || undefined
+
+        try {
+          const response = await fetch(`${API_BASE}/api/skills/reload`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ skillsFolder, memoriesFolder }),
+          })
+          const data = await response.json()
+          allSkills = data.skills || []
+
+          const customCount = data.customSkillsCount || 0
+          const memoriesCount = data.memoriesCount || 0
+
+          showToast(`Loaded ${customCount} custom skills, ${memoriesCount} memories`)
+          renderSkillsSelector()
+        } catch (error) {
+          console.error('Failed to reload skills:', error)
+          showToast('Failed to reload skills', true)
+        }
+      }
+
+      function renderSkillsSelector() {
+        const container = document.getElementById('skillsSelector')
+        if (!container) return
+
+        console.log(
+          '[Settings] Rendering skills selector, allSkills:',
+          allSkills.length,
+          'selectedSkills:',
+          selectedSkills
+        )
+
+        const builtIn = allSkills.filter((s) => !s.isCustom)
+        const custom = allSkills.filter((s) => s.isCustom)
+
+        let html = ''
+
+        if (builtIn.length > 0) {
+          html +=
+            '<div class="skills-section-title" style="grid-column: 1 / -1;">Built-in Skills</div>'
+          html += builtIn.map((skill) => renderSkillItem(skill)).join('')
+        }
+
+        if (custom.length > 0) {
+          html +=
+            '<div class="skills-section-title" style="grid-column: 1 / -1;">Custom Skills</div>'
+          html += custom.map((skill) => renderSkillItem(skill)).join('')
+        }
+
+        if (allSkills.length === 0) {
+          html =
+            '<div style="grid-column: 1 / -1; color: var(--text-secondary); text-align: center; padding: 16px;">No skills available</div>'
+        }
+
+        container.innerHTML = html
+
+        // Add click handlers
+        container.querySelectorAll('.skill-item').forEach((item) => {
+          item.addEventListener('click', (e) => {
+            if (e.target.type === 'checkbox') return
+            const checkbox = item.querySelector('input[type="checkbox"]')
+            checkbox.checked = !checkbox.checked
+            updateSkillSelection(item, checkbox.checked)
+          })
+
+          item.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
+            updateSkillSelection(item, e.target.checked)
+          })
+        })
+      }
+
+      function renderSkillItem(skill) {
+        const isSelected = selectedSkills.includes(skill.id)
+        return `
+        <label class="skill-item ${isSelected ? 'selected' : ''}" data-skill-id="${skill.id}">
+          <input type="checkbox" ${isSelected ? 'checked' : ''} />
+          <span class="skill-icon">${skill.icon}</span>
+          <span class="skill-info">
+            <span class="skill-name">${escapeHtml(skill.name)}${skill.isCustom ? '<span class="skill-custom-badge">Custom</span>' : ''}</span>
+          </span>
+        </label>
+      `
+      }
+
+      function updateSkillSelection(item, isSelected) {
+        const skillId = item.dataset.skillId
+
+        if (isSelected) {
+          if (!selectedSkills.includes(skillId)) {
+            selectedSkills.push(skillId)
+          }
+          item.classList.add('selected')
+        } else {
+          selectedSkills = selectedSkills.filter((id) => id !== skillId)
+          item.classList.remove('selected')
+        }
+      }
+
+      // Event listeners
+      document.getElementById('reloadSkillsBtn')?.addEventListener('click', () => {
+        reloadSkillsFromFolders()
+      })
+
+      // Initial load
+      loadSettings()
+      loadAgents()
+      loadModels()
+      loadSkills()
+    </script>
+  </body>
+</html>
