@@ -62,23 +62,39 @@ Easy configuration with multiple tabs.
 
 ### Prerequisites
 
-- **macOS 12.0** or later
-- **Node.js 20.0** or later
+- **macOS 12.0** or later (Apple Silicon)
 - **[OpenCode CLI](https://opencode.ai)** installed and configured
 - **GitHub Personal Access Token** with `repo` and `read:org` scopes
 
 ### Installation
 
+#### Option 1: Download Pre-built App (Recommended)
+
+1. Download the latest release from [GitHub Releases](https://github.com/i-denipermana/prpal/releases/latest)
+2. Open `PRPal-x.x.x-arm64.dmg`
+3. Drag PRPal to your Applications folder
+4. **Important:** Since the app is not code-signed, you may need to allow it:
+   ```bash
+   xattr -cr /Applications/PRPal.app
+   ```
+5. Launch PRPal from Applications
+
+#### Option 2: Build from Source
+
 ```bash
 # Clone the repository
-git clone <repository-url> prpal
+git clone https://github.com/i-denipermana/prpal.git
 cd prpal
 
 # Install dependencies
 npm install
 
-# Configure (interactive setup on first run)
-npm run dev:electron
+# Build and run
+npm run build
+npm run start:electron
+
+# Or build distributable
+npm run dist
 ```
 
 The app will guide you through an onboarding wizard on first launch to configure your GitHub credentials.
