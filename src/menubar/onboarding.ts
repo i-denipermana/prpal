@@ -54,11 +54,8 @@ function createOnboardingWindow(): BrowserWindow {
 }
 
 function getOnboardingUrl(): string {
-  const isDev = process.env['NODE_ENV'] === 'development'
-  if (isDev) {
-    return 'http://localhost:3847/onboarding.html'
-  }
-  return `file://${join(__dirname, '../renderer/onboarding.html')}`
+  // Always use HTTP server since it's started before onboarding
+  return 'http://localhost:3847/onboarding.html'
 }
 
 function getPreloadPath(): string {
