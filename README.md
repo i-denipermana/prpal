@@ -30,6 +30,34 @@ PRPal streamlines your code review workflow by:
 | **Review Preview**        | Review and edit AI suggestions before posting to GitHub                             |
 | **Inline Comments**       | Posts file-specific comments directly on the relevant lines                         |
 
+## Screenshots
+
+### Menu Bar Integration
+
+PRPal sits in your macOS menu bar, always ready.
+
+![Menu Bar](assets/screenshots/menubar-icon.png)
+
+### PR List View
+
+See all PRs organized by priority with powerful filters.
+
+![PR List](assets/screenshots/pr-list.png)
+
+### PR Detail View
+
+Full PR details with syntax-highlighted diff view.
+
+![PR Detail](assets/screenshots/pr-detail.png)
+
+### Settings
+
+Easy configuration with multiple tabs.
+
+| General Settings                                               | Review Agents                                                       |
+| -------------------------------------------------------------- | ------------------------------------------------------------------- |
+| ![Settings - General](assets/screenshots/settings-general.png) | ![Settings - Review Agents](assets/screenshots/settings-agents.png) |
+
 ## Quick Start
 
 ### Prerequisites
