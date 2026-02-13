@@ -1,9 +1,15 @@
 /** macOS native notification service */
 
 import notifier from 'node-notifier'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import type { PullRequest } from '../../types/pr.js'
 import type { ReviewResult } from '../../types/review.js'
 import { debug } from '../../utils/logger.js'
+
+// Get the path to the app icon for notifications
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const iconPath = path.resolve(__dirname, '../../../assets/icon-512.png')
 
 export interface NotificationOptions {
   sound: boolean
@@ -15,6 +21,7 @@ export function notifyNewPR(pr: PullRequest, options: NotificationOptions): void
   notifier.notify({
     title: `PR Review Requested`,
     message: `#${pr.number}: ${pr.title}\nby ${pr.author.login}`,
+    icon: iconPath,
     sound: options.sound,
     wait: true,
     timeout: 10,
@@ -27,6 +34,7 @@ export function notifyMultiplePRs(count: number, options: NotificationOptions): 
   notifier.notify({
     title: `${count} PRs Need Review`,
     message: `You have ${count} pull requests waiting for your review`,
+    icon: iconPath,
     sound: options.sound,
     wait: true,
     timeout: 10,
@@ -46,6 +54,7 @@ export function notifyReviewComplete(
   notifier.notify({
     title: `Review Complete ${verdictEmoji}`,
     message: `PR #${pr.number}: ${pr.title}\n${issueCount} issue(s) found`,
+    icon: iconPath,
     sound: options.sound,
     wait: true,
     timeout: 10,
@@ -62,6 +71,7 @@ export function notifyReviewError(
   notifier.notify({
     title: `Review Failed`,
     message: `PR #${pr.number}: ${errorMessage}`,
+    icon: iconPath,
     sound: false,
     wait: false,
     timeout: 5,
