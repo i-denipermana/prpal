@@ -15,6 +15,10 @@ export function createTrayIcon(): string {
   console.log('[Tray] Icon path:', iconPath)
   console.log('[Tray] Icon exists:', existsSync(iconPath))
   trayIcon = nativeImage.createFromPath(iconPath)
+  console.log('[Tray] Icon size:', trayIcon.getSize())
+  console.log('[Tray] Icon isEmpty:', trayIcon.isEmpty())
+  // Use template image for proper macOS light/dark menu bar support
+  trayIcon.setTemplateImage(true)
   return iconPath
 }
 
