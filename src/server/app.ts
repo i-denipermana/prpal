@@ -44,6 +44,13 @@ async function registerPlugins(server: FastifyInstance): Promise<void> {
     root: join(__dirname, '../renderer'),
     prefix: '/',
   })
+
+  // Serve assets (icons, images) from assets directory
+  await server.register(fastifyStatic, {
+    root: join(__dirname, '../../assets'),
+    prefix: '/assets/',
+    decorateReply: false,
+  })
 }
 
 function registerRoutes(server: FastifyInstance): void {
