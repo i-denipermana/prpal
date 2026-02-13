@@ -10,7 +10,13 @@ import {
   notifyMultiplePRs,
   onNotificationClick,
 } from './services/notification/native.js'
-import { createServer, startServer, setGitHubClient, setReviewClient } from './server/index.js'
+import {
+  createServer,
+  startServer,
+  setGitHubClient,
+  setReviewClient,
+  setPollContext,
+} from './server/index.js'
 import { info, warn, error as logError, setLogLevel } from './utils/logger.js'
 import { needsOnboarding } from './services/state/onboardingStore.js'
 import type { ResolvedConfig } from './types/config.js'
@@ -80,6 +86,9 @@ function setupPolling(
   const { org, username } = config.github
   const { intervalMs } = config.polling
   const notificationOpts = { sound: config.notification.sound }
+
+  // Set poll context for manual refresh API
+  setPollContext(org, username, userTeams)
 
   startPolling(client, org, username, userTeams, intervalMs, (newPRs) => {
     if (newPRs.length === 0) return

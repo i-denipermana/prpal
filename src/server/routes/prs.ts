@@ -12,51 +12,80 @@ import {
 import { getReviewState } from '../../services/state/reviewStore.js'
 import { fetchPRDiff, fetchPRFiles, fetchPRChecks } from '../../services/github/diffFetcher.js'
 import type { GitHubClient } from '../../services/github/client.js'
+import type { UserTeams } from '../../services/github/teamDetector.js'
+import { pollNow } from '../../services/polling/index.js'
+import { info } from '../../utils/logger.js'
 
 interface PRContext {
   client: GitHubClient | null
+  org: string | null
+  username: string | null
+  userTeams: UserTeams | null
 }
 
-const context: PRContext = { client: null }
+const context: PRContext = { client: null, org: null, username: null, userTeams: null }
 
 export function setGitHubClient(client: GitHubClient): void {
   context.client = client
 }
 
+export function setPollContext(org: string, username: string, userTeams: UserTeams): void {
+  context.org = org
+  context.username = username
+  context.userTeams = userTeams
+}
+
 export function registerPRRoutes(server: FastifyInstance): void {
   server.get('/api/prs', handleListPRs)
+  server.post('/api/prs/refresh', handleRefresh)
   server.get('/api/prs/:id', handleGetPR)
   server.post('/api/prs/:id/seen', handleMarkSeen)
   server.post('/api/prs/:id/dismiss', handleDismiss)
   server.post('/api/prs/:id/reviewed', handleMarkReviewed)
 }
 
+async function handleRefresh(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  if (!context.client || !context.org || !context.username || !context.userTeams) {
+    void reply.status(500).send({ error: 'Poll context not initialized' })
+    return
+  }
+
+  info('Manual refresh triggered via API')
+
+  try {
+    const prs = await pollNow(context.client, context.org, context.username, context.userTeams)
+    void reply.send({ success: true, count: prs.length })
+  } catch (error) {
+    void reply.status(500).send({ error: 'Failed to refresh PRs' })
+  }
+}
+
 function handleListPRs(_request: FastifyRequest, reply: FastifyReply): void {
   const myReviewStates = getMyReviewPRs()
   const otherStates = getOtherPRs()
   const userTeams = getUserTeams()
-  
+
   const myReviewItems = myReviewStates.map(mapToListItem)
   const otherItems = otherStates.map(mapToListItem)
   const allItems = [...myReviewItems, ...otherItems]
-  
+
   // Filter "my team" PRs - PRs requesting review from user's teams (but not directly from user)
-  const myReviewIds = new Set(myReviewItems.map(p => p.id))
-  const myTeamItems = otherItems.filter(pr => {
+  const myReviewIds = new Set(myReviewItems.map((p) => p.id))
+  const myTeamItems = otherItems.filter((pr) => {
     if (myReviewIds.has(pr.id)) return false // Already in myReview
-    return pr.requestedTeams.some(team => userTeams.includes(team))
+    return pr.requestedTeams.some((team) => userTeams.includes(team))
   })
-  const myTeamIds = new Set(myTeamItems.map(p => p.id))
-  
+  const myTeamIds = new Set(myTeamItems.map((p) => p.id))
+
   // "Other" is now PRs not in myReview or myTeam
-  const remainingOther = otherItems.filter(pr => !myTeamIds.has(pr.id))
-  
+  const remainingOther = otherItems.filter((pr) => !myTeamIds.has(pr.id))
+
   // Extract unique values for filters
   const repositories = [...new Set(allItems.map((p) => p.repository))].sort()
   const reviewers = [...new Set(allItems.flatMap((p) => p.requestedReviewers))].sort()
   const teams = [...new Set(allItems.flatMap((p) => p.requestedTeams))].sort()
-  
-  void reply.send({ 
+
+  void reply.send({
     prs: allItems,
     myReview: myReviewItems,
     myTeam: myTeamItems,
@@ -69,7 +98,7 @@ function handleListPRs(_request: FastifyRequest, reply: FastifyReply): void {
       repositories,
       reviewers,
       teams,
-    }
+    },
   })
 }
 
@@ -145,19 +174,13 @@ function createBasicDetails(pr: PullRequest): PRWithDetails {
   return { ...pr, files: [], diff: '', checks: [] }
 }
 
-function handleMarkSeen(
-  request: FastifyRequest<{ Params: PRParams }>,
-  reply: FastifyReply
-): void {
+function handleMarkSeen(request: FastifyRequest<{ Params: PRParams }>, reply: FastifyReply): void {
   const { id } = request.params
   updatePRStatus(decodeURIComponent(id), 'seen')
   void reply.send({ success: true })
 }
 
-function handleDismiss(
-  request: FastifyRequest<{ Params: PRParams }>,
-  reply: FastifyReply
-): void {
+function handleDismiss(request: FastifyRequest<{ Params: PRParams }>, reply: FastifyReply): void {
   const { id } = request.params
   updatePRStatus(decodeURIComponent(id), 'dismissed')
   void reply.send({ success: true })

@@ -861,10 +861,18 @@
       }
 
       // Event handlers
-      document.getElementById('refreshBtn').addEventListener('click', () => {
+      document.getElementById('refreshBtn').addEventListener('click', async () => {
         showLoading()
-        fetchPRs()
-        fetchStatus()
+        try {
+          // Trigger actual GitHub fetch
+          await fetch(`${API_BASE}/api/prs/refresh`, { method: 'POST' })
+          // Then update the UI
+          await fetchPRs()
+          fetchStatus()
+        } catch (error) {
+          console.error('Refresh failed:', error)
+          hideLoading()
+        }
       })
 
       document.getElementById('settingsBtn').addEventListener('click', () => {

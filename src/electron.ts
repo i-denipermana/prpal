@@ -10,7 +10,13 @@ import { tryLoadConfig, hasValidConfig } from './config/env.js'
 import { needsOnboarding, resetOnboarding } from './services/state/onboardingStore.js'
 import { initAgentStore } from './services/state/agentStore.js'
 import { initSkillsAndMemories } from './services/opencode/skills.js'
-import { createServer, startServer, setGitHubClient, setReviewClient } from './server/index.js'
+import {
+  createServer,
+  startServer,
+  setGitHubClient,
+  setReviewClient,
+  setPollContext,
+} from './server/index.js'
 import { createGitHubClient } from './services/github/client.js'
 import { detectUserTeams } from './services/github/teamDetector.js'
 import { startPolling, stopPolling } from './services/polling/index.js'
@@ -88,6 +94,9 @@ async function initializeApp(config: ResolvedConfig): Promise<void> {
   try {
     const userTeams = await detectUserTeams(client, config.github.org)
     info(`Detected ${userTeams.teams.length} teams for user`)
+
+    // Set poll context for manual refresh API
+    setPollContext(config.github.org, config.github.username, userTeams)
 
     // Start polling
     const notificationOpts = { sound: config.notification.sound }
