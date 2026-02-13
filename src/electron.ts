@@ -14,7 +14,11 @@ import { createServer, startServer, setGitHubClient, setReviewClient } from './s
 import { createGitHubClient } from './services/github/client.js'
 import { detectUserTeams } from './services/github/teamDetector.js'
 import { startPolling, stopPolling } from './services/polling/index.js'
-import { notifyNewPR, notifyMultiplePRs } from './services/notification/native.js'
+import {
+  notifyNewPR,
+  notifyMultiplePRs,
+  onNotificationClick,
+} from './services/notification/electron.js'
 import { showOnboardingWindow } from './menubar/onboarding.js'
 import { createTrayIcon, updateBadge } from './menubar/tray.js'
 import { createContextMenu } from './menubar/menu.js'
@@ -62,6 +66,12 @@ async function main(): Promise<void> {
 
   // Create menubar
   createMenubarApp(config)
+
+  // Setup notification click handler
+  onNotificationClick(() => {
+    info('Notification clicked - showing window')
+    mb?.showWindow()
+  })
 
   info('PRPal is running')
 }
