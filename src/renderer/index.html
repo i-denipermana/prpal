@@ -53,8 +53,16 @@
       }
 
       .header-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
         font-size: 14px;
         font-weight: 600;
+      }
+
+      .header-logo {
+        width: 20px;
+        height: 20px;
       }
 
       .header-actions {
@@ -408,7 +416,10 @@
   <body>
     <div class="container">
       <header>
-        <span class="header-title">Pull Requests</span>
+        <span class="header-title">
+          <img class="header-logo" src="/assets/icon-512.png" alt="PRPal" />
+          Pull Requests
+        </span>
         <div class="header-actions">
           <button class="btn" id="refreshBtn" title="Refresh">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
