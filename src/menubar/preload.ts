@@ -19,6 +19,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return ipcRenderer.invoke('window:close')
   },
 
+  // App control
+  quitApp: () => {
+    return ipcRenderer.invoke('app:quit')
+  },
+
   // App info
   getVersion: () => {
     return ipcRenderer.invoke('app:getVersion')
@@ -36,6 +41,7 @@ declare global {
       }) => Promise<{ success: boolean }>
       openSettings: () => Promise<void>
       closeWindow: () => Promise<void>
+      quitApp: () => Promise<void>
       getVersion: () => Promise<string>
     }
   }

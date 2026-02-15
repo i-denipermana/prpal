@@ -239,6 +239,12 @@ ipcMain.handle('shell:openExternal', (_event, url: string) => {
   void shell.openExternal(url)
 })
 
+ipcMain.handle('app:quit', () => {
+  stopPolling()
+  server?.close()
+  app.quit()
+})
+
 function openPRDetailWindow(prId: string): void {
   const detailWindow = new BrowserWindow({
     width: 900,
