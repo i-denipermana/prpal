@@ -1,14 +1,9 @@
 /** Electron native notification service - uses app icon automatically */
 
-import { Notification, nativeImage, app } from 'electron'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { existsSync } from 'node:fs'
+import { Notification } from 'electron'
 import type { PullRequest } from '../../types/pr.js'
 import type { ReviewResult } from '../../types/review.js'
 import { debug } from '../../utils/logger.js'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export interface NotificationOptions {
   sound: boolean
@@ -17,35 +12,16 @@ export interface NotificationOptions {
 // Click handler callback
 let clickCallback: (() => void) | null = null
 
-// Get the app icon path
-function getIconPath(): string {
-  const possiblePaths = [
-    join(app.getAppPath(), 'assets', 'icon-512.png'),
-    join(process.resourcesPath ?? '', 'assets', 'icon-512.png'),
-    join(__dirname, '../../../assets/icon-512.png'),
-  ]
-
-  for (const p of possiblePaths) {
-    if (existsSync(p)) {
-      return p
-    }
-  }
-
-  return possiblePaths[0]!
-}
-
 function createNotification(
   title: string,
   body: string,
   _options: NotificationOptions
 ): Notification {
-  const iconPath = getIconPath()
-  const icon = nativeImage.createFromPath(iconPath)
-
+  // On macOS, don't set icon - the system automatically uses the app icon
+  // Setting icon causes duplicate icons (app icon on left, custom on right)
   const notification = new Notification({
     title,
     body,
-    icon,
     silent: !_options.sound,
   })
 
