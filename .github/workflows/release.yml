@@ -33,14 +33,13 @@ jobs:
     needs: test
     runs-on: macos-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           - arch: x64
             name: Intel
           - arch: arm64
             name: Apple Silicon
-          - arch: universal
-            name: Universal
     steps:
       - uses: actions/checkout@v4
 
@@ -96,7 +95,6 @@ jobs:
             | Platform | Download |
             |----------|----------|
             | Apple Silicon (M1/M2/M3) | `PRPal-*-arm64.dmg` |
-            | Intel | `PRPal-*-mac.dmg` or `PRPal-*-x64.dmg` |
-            | Universal (both) | `PRPal-*-universal.dmg` |
+            | Intel | `PRPal-*-x64.dmg` |
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
