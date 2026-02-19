@@ -30,4 +30,9 @@ declare module 'menubar' {
   }
 
   export function menubar(options?: MenubarOptions): Menubar
+
+  const pkg: {
+    menubar: typeof menubar
+  }
+  export default pkg
 }

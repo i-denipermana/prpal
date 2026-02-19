@@ -1,7 +1,9 @@
 /** Electron menubar application */
 
 import { app, BrowserWindow } from 'electron'
-import { menubar, Menubar } from 'menubar'
+import pkg from 'menubar'
+const { menubar } = pkg
+import type { Menubar } from 'menubar'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { info } from '../utils/logger.js'
