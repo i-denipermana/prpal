@@ -3,11 +3,30 @@ name: Build
 on:
   push:
     branches: [main]
+    # Don't run on release commits (handled by release.yml)
+    tags-ignore:
+      - 'v*'
   pull_request:
     branches: [main]
 
 jobs:
+  # Skip if this is a release commit (npm version creates "Release X.Y.Z" commits)
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.check.outputs.should_skip }}
+    steps:
+      - id: check
+        run: |
+          if [[ "${{ github.event.head_commit.message }}" =~ ^Release\ [0-9] ]]; then
+            echo "should_skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_skip=false" >> $GITHUB_OUTPUT
+          fi
+
   test:
+    needs: check
+    if: needs.check.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -31,7 +50,8 @@ jobs:
         run: npm run test
 
   build:
-    needs: test
+    needs: [check, test]
+    if: needs.check.outputs.should_skip != 'true'
     runs-on: macos-latest
     strategy:
       matrix:

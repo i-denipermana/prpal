@@ -68,12 +68,21 @@ Easy configuration with multiple tabs.
 
 ### Installation
 
-#### Option 1: Download Pre-built App (Recommended)
+#### Option 1: Homebrew (Recommended)
+
+```bash
+brew tap i-denipermana/prpal
+brew install --cask prpal
+```
+
+The Homebrew cask automatically handles the security bypass for unsigned apps.
+
+#### Option 2: Download Pre-built App
 
 1. Download the latest release from [GitHub Releases](https://github.com/i-denipermana/prpal/releases/latest)
-2. Open `PRPal-x.x.x-arm64.dmg`
+2. Open `PRPal-x.x.x-arm64.dmg` (Apple Silicon) or `PRPal-x.x.x.dmg` (Intel)
 3. Drag PRPal to your Applications folder
-4. **Important:** Since the app is not code-signed, you may need to allow it:
+4. **Important:** Since the app is not code-signed, you need to allow it:
    ```bash
    xattr -cr /Applications/PRPal.app
    ```

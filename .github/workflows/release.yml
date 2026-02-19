@@ -5,8 +5,27 @@ on:
     tags:
       - 'v*'
 
+# Ensure only one release runs at a time
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
+  # Wait for CodeQL security analysis to complete
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for CodeQL to complete
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.sha }}
+          check-name: 'Analyze'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+          allowed-conclusions: success,skipped
+
   test:
+    needs: security
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
