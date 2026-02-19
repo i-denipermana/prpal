@@ -1,18 +1,28 @@
 declare module 'menubar' {
-  import { BrowserWindow, Tray, App, Rectangle, BrowserWindowConstructorOptions } from 'electron'
+  import {
+    BrowserWindow,
+    Tray,
+    App,
+    Rectangle,
+    BrowserWindowConstructorOptions,
+    NativeImage,
+  } from 'electron'
 
-  export interface MenubarOptions {
+  // menubar v5.2.3 passes all options directly to BrowserWindow
+  // So MenubarOptions extends BrowserWindowConstructorOptions
+  export interface MenubarOptions extends BrowserWindowConstructorOptions {
     dir?: string
     index?: string | false
     appDir?: string
     tooltip?: string
-    icon?: string
+    icon?: string | NativeImage
     preloadWindow?: boolean
     showOnAllWorkspaces?: boolean
     windowPosition?: string
     showDockIcon?: boolean
-    browserWindow?: BrowserWindowConstructorOptions
     activateWithApp?: boolean
+    showOnRightClick?: boolean
+    alwaysOnTop?: boolean
   }
 
   export interface Menubar {

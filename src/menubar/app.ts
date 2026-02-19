@@ -35,12 +35,13 @@ async function handleAppReady(): Promise<void> {
 function createMenubarApp(): void {
   const trayIcon = createTrayIcon()
 
+  // menubar v5.2.3 passes opts directly to BrowserWindow (not nested)
   mb = createMenubar({
     index: getIndexUrl(),
     icon: trayIcon,
     preloadWindow: true,
-    browserWindow: getBrowserWindowOptions(),
     showDockIcon: false,
+    ...getBrowserWindowOptions(),
   })
 
   mb.on('ready', onMenubarReady)

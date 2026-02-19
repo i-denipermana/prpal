@@ -126,19 +126,18 @@ async function initializeApp(config: ResolvedConfig): Promise<void> {
 function createMenubarApp(config: ResolvedConfig): void {
   const trayIcon = createTrayIcon()
 
+  // menubar v5.2.3 passes opts directly to BrowserWindow (not nested under browserWindow)
   mb = createMenubar({
     index: getIndexUrl(),
     icon: trayIcon,
     preloadWindow: true,
-    browserWindow: {
-      width: 400,
-      height: 500,
-      resizable: false,
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        preload: getPreloadPath(),
-      },
+    width: 400,
+    height: 500,
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: getPreloadPath(),
     },
     showDockIcon: false,
   })
