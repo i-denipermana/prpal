@@ -29,10 +29,9 @@ declare module 'menubar' {
     on: (event: string, listener: (...args: unknown[]) => void) => void
   }
 
-  export function menubar(options?: MenubarOptions): Menubar
-
-  const pkg: {
-    menubar: typeof menubar
-  }
-  export default pkg
+  // menubar v5.2.3 default export is the create function directly
+  function createMenubar(options?: MenubarOptions): Menubar
+  export default createMenubar
+  export { createMenubar as menubar }
+  export type { Menubar, MenubarOptions }
 }

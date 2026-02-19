@@ -29,8 +29,7 @@ import { showOnboardingWindow } from './menubar/onboarding.js'
 import { createTrayIcon, updateBadge } from './menubar/tray.js'
 import { createContextMenu } from './menubar/menu.js'
 import { addChangeListener, getNewPRCount } from './services/state/prStore.js'
-import pkg from 'menubar'
-const { menubar } = pkg
+import createMenubar from 'menubar'
 import type { Menubar } from 'menubar'
 import type { ResolvedConfig } from './types/config.js'
 
@@ -127,7 +126,7 @@ async function initializeApp(config: ResolvedConfig): Promise<void> {
 function createMenubarApp(config: ResolvedConfig): void {
   const trayIcon = createTrayIcon()
 
-  mb = menubar({
+  mb = createMenubar({
     index: getIndexUrl(),
     icon: trayIcon,
     preloadWindow: true,

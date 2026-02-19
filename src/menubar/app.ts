@@ -1,8 +1,7 @@
 /** Electron menubar application */
 
 import { app, BrowserWindow } from 'electron'
-import pkg from 'menubar'
-const { menubar } = pkg
+import createMenubar from 'menubar'
 import type { Menubar } from 'menubar'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -36,7 +35,7 @@ async function handleAppReady(): Promise<void> {
 function createMenubarApp(): void {
   const trayIcon = createTrayIcon()
 
-  mb = menubar({
+  mb = createMenubar({
     index: getIndexUrl(),
     icon: trayIcon,
     preloadWindow: true,
