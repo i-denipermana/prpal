@@ -1,6 +1,6 @@
 {
   "name": "prpal",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "PRPal - Your AI-powered PR review companion for macOS",
   "main": "dist/electron.js",
   "type": "module",
