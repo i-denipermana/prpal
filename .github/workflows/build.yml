@@ -1,11 +1,8 @@
-name: Build
+name: CI
 
 on:
   push:
     branches: [main]
-    # Don't run on release commits (handled by release.yml)
-    tags-ignore:
-      - 'v*'
   pull_request:
     branches: [main]
 
@@ -49,42 +46,5 @@ jobs:
       - name: Run tests
         run: npm run test
 
-  build:
-    needs: [check, test]
-    if: needs.check.outputs.should_skip != 'true'
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        include:
-          - arch: x64
-            name: Intel
-          - arch: arm64
-            name: Apple Silicon
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install
-
       - name: Build TypeScript
         run: npm run build
-
-      - name: Build Electron app (${{ matrix.name }})
-        run: npx electron-builder --mac --${{ matrix.arch }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v6
-        with:
-          name: PRPal-macOS-${{ matrix.arch }}
-          path: |
-            release/*.dmg
-            release/*.zip
-          if-no-files-found: error
