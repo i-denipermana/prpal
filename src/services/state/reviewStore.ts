@@ -1,11 +1,16 @@
 /** Review store - caches review results */
 
-import type { ReviewResult, ReviewState, ReviewStage, InlineCommentState } from '../../types/review.js'
+import type {
+  ReviewResult,
+  ReviewState,
+  ReviewStage,
+  InlineCommentState,
+} from '../../types/review.js'
 import { debug } from '../../utils/logger.js'
 
 type ReviewStateMap = Map<string, ReviewState>
 
-let reviewStates: ReviewStateMap = new Map()
+const reviewStates: ReviewStateMap = new Map()
 
 const STAGE_PROGRESS: Record<ReviewStage, number> = {
   starting: 10,
@@ -47,7 +52,7 @@ export function setReviewInProgress(prId: string, stage?: ReviewStage): void {
 export function updateReviewStage(prId: string, stage: ReviewStage): void {
   const existing = reviewStates.get(prId)
   if (!existing || existing.status !== 'in_progress') return
-  
+
   reviewStates.set(prId, {
     ...existing,
     stage,
@@ -58,10 +63,8 @@ export function updateReviewStage(prId: string, stage: ReviewStage): void {
 
 export function setReviewCompleted(prId: string, result: ReviewResult): void {
   const existing = reviewStates.get(prId)
-  const duration = existing?.startedAt 
-    ? Date.now() - existing.startedAt.getTime() 
-    : 0
-  
+  const duration = existing?.startedAt ? Date.now() - existing.startedAt.getTime() : 0
+
   reviewStates.set(prId, {
     prId,
     status: 'completed',
@@ -87,7 +90,7 @@ export function setReviewFailed(prId: string, error: string): void {
 export function setReviewCancelled(prId: string): boolean {
   const existing = reviewStates.get(prId)
   if (!existing || existing.status !== 'in_progress') return false
-  
+
   reviewStates.set(prId, {
     ...existing,
     prId,

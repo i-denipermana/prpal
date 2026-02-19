@@ -311,14 +311,17 @@ function expandPath(path?: string): string | undefined {
   return path
 }
 
-export function initSkillsAndMemories(skillsFolderPath?: string, memoriesFolderPath?: string): void {
+export function initSkillsAndMemories(
+  skillsFolderPath?: string,
+  memoriesFolderPath?: string
+): void {
   skillsFolder = expandPath(skillsFolderPath)
   memoriesFolder = expandPath(memoriesFolderPath)
-  
+
   if (skillsFolder) {
     loadCustomSkills(skillsFolder)
   }
-  
+
   if (memoriesFolder) {
     loadMemories(memoriesFolder)
   }
@@ -381,11 +384,11 @@ function parseSkillFile(filePath: string): CustomSkill | null {
   try {
     const content = readFileSync(filePath, 'utf-8')
     const fileName = basename(filePath, extname(filePath))
-    
+
     // Try to extract frontmatter
     const frontmatter = extractFrontmatter(content)
     const body = removeFrontmatter(content)
-    
+
     return {
       id: fileName.toLowerCase().replace(/\s+/g, '-'),
       name: frontmatter.name || frontmatter.title || formatName(fileName),
@@ -405,10 +408,10 @@ function parseMemoryFile(filePath: string): Memory | null {
   try {
     const content = readFileSync(filePath, 'utf-8')
     const fileName = basename(filePath, extname(filePath))
-    
+
     const frontmatter = extractFrontmatter(content)
     const body = removeFrontmatter(content)
-    
+
     return {
       id: fileName.toLowerCase().replace(/\s+/g, '-'),
       name: frontmatter.name || frontmatter.title || formatName(fileName),
@@ -425,19 +428,22 @@ function parseMemoryFile(filePath: string): Memory | null {
 function extractFrontmatter(content: string): Record<string, string> {
   const match = content.match(/^---\n([\s\S]*?)\n---/)
   if (!match) return {}
-  
+
   const frontmatter: Record<string, string> = {}
   const lines = match[1].split('\n')
-  
+
   for (const line of lines) {
     const colonIndex = line.indexOf(':')
     if (colonIndex > 0) {
       const key = line.slice(0, colonIndex).trim()
-      const value = line.slice(colonIndex + 1).trim().replace(/^["']|["']$/g, '')
+      const value = line
+        .slice(colonIndex + 1)
+        .trim()
+        .replace(/^["']|["']$/g, '')
       frontmatter[key] = value
     }
   }
-  
+
   return frontmatter
 }
 
@@ -448,9 +454,7 @@ function removeFrontmatter(content: string): string {
 
 /** Format filename to display name */
 function formatName(fileName: string): string {
-  return fileName
-    .replace(/[-_]/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase())
+  return fileName.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
 /** Get all custom skills */
@@ -492,32 +496,36 @@ export function buildCustomSkillsPrompt(skillIds: string[]): string {
   const skills = skillIds
     .map((id) => getCustomSkill(id))
     .filter((s): s is CustomSkill => s !== undefined)
-  
+
   if (skills.length === 0) return ''
-  
+
   return '\n\n## Custom Review Focus\n\n' + skills.map((s) => s.content).join('\n\n')
 }
 
 /** Build prompt with ALL loaded memories (for context) */
 export function buildAllMemoriesPrompt(): string {
   if (memories.length === 0) return ''
-  
+
   return '\n\n## Project Context & Memories\n\n' + memories.map((m) => m.content).join('\n\n')
 }
 
 /** Build prompt with memories */
 export function buildMemoriesPrompt(memoryIds: string[]): string {
-  const mems = memoryIds
-    .map((id) => getMemory(id))
-    .filter((m): m is Memory => m !== undefined)
-  
+  const mems = memoryIds.map((id) => getMemory(id)).filter((m): m is Memory => m !== undefined)
+
   if (mems.length === 0) return ''
-  
+
   return '\n\n## Context & Memories\n\n' + mems.map((m) => m.content).join('\n\n')
 }
 
 /** Get combined list of built-in and custom skills for UI */
-export function getAllSkillsForUI(): Array<{ id: string; name: string; description: string; icon: string; isCustom: boolean }> {
+export function getAllSkillsForUI(): Array<{
+  id: string
+  name: string
+  description: string
+  icon: string
+  isCustom: boolean
+}> {
   const builtIn = Object.values(SKILLS).map((s) => ({
     id: s.id,
     name: s.name,
@@ -525,7 +533,7 @@ export function getAllSkillsForUI(): Array<{ id: string; name: string; descripti
     icon: s.icon,
     isCustom: false,
   }))
-  
+
   const custom = customSkills.map((s) => ({
     id: `custom:${s.id}`,
     name: s.name,
@@ -533,7 +541,7 @@ export function getAllSkillsForUI(): Array<{ id: string; name: string; descripti
     icon: s.icon,
     isCustom: true,
   }))
-  
+
   return [...builtIn, ...custom]
 }
 

@@ -43,7 +43,7 @@ export async function executeOpenCode(
 ): Promise<ExecuteResult> {
   const { prompt, agent, timeoutMs = DEFAULT_TIMEOUT, model, prId } = options
   const startTime = Date.now()
-  
+
   const effectiveModel = model || agent.model
   const provider = extractProvider(effectiveModel)
 
@@ -57,9 +57,9 @@ export async function executeOpenCode(
 
   const args = buildArgs(prompt, agent, effectiveModel)
   const env = buildEnv(agent)
-  
+
   // Log full command for debugging
-  info('[OpenCode] Executing command', { 
+  info('[OpenCode] Executing command', {
     path: opencodePath,
     args: args,
     model: effectiveModel,
@@ -74,14 +74,14 @@ export async function executeOpenCode(
     if (!proc.pid) {
       info('[OpenCode] WARNING: Process may not have started properly')
     }
-    
+
     // Write prompt to stdin to avoid shell escaping issues with long prompts
     info('[OpenCode] Writing prompt to stdin', { promptLength: prompt.length })
     proc.stdin.write(prompt)
     proc.stdin.end()
-    
-    info('[OpenCode] Process spawned', { 
-      pid: proc.pid, 
+
+    info('[OpenCode] Process spawned', {
+      pid: proc.pid,
       model: effectiveModel,
       promptLength: prompt.length,
       command: `${opencodePath} ${args.join(' ').slice(0, 100)}...`,
@@ -99,8 +99,8 @@ export async function executeOpenCode(
 
     const timeoutId = setTimeout(() => {
       killed = true
-      info('[OpenCode] Timeout reached, terminating process', { 
-        timeoutMs, 
+      info('[OpenCode] Timeout reached, terminating process', {
+        timeoutMs,
         timeoutMin: Math.round(timeoutMs / 60000),
         elapsed: Date.now() - startTime,
         model: effectiveModel,
@@ -128,7 +128,7 @@ export async function executeOpenCode(
       // Log progress every 5 seconds to avoid spam
       if (now - lastLogTime > 5000) {
         const elapsed = Math.round((now - startTime) / 1000)
-        info('[OpenCode] Receiving AI response...', { 
+        info('[OpenCode] Receiving AI response...', {
           totalBytes: stdout.length,
           elapsed: elapsed + 's',
           model: effectiveModel,
@@ -151,12 +151,12 @@ export async function executeOpenCode(
       clearTimeout(timeoutId)
       clearInterval(statusInterval)
       if (prId) runningProcesses.delete(prId)
-      
+
       const duration = Date.now() - startTime
 
       if (cancelled) {
-        info('[OpenCode] Execution cancelled', { 
-          duration, 
+        info('[OpenCode] Execution cancelled', {
+          duration,
           durationSec: Math.round(duration / 1000) + 's',
           model: effectiveModel,
         })
@@ -165,10 +165,10 @@ export async function executeOpenCode(
       }
 
       if (killed) {
-        info('[OpenCode] Execution timed out', { 
-          duration, 
+        info('[OpenCode] Execution timed out', {
+          duration,
           durationSec: Math.round(duration / 1000) + 's',
-          timeoutMs, 
+          timeoutMs,
           model: effectiveModel,
         })
         reject(createTimeoutError(timeoutMs))
@@ -178,8 +178,8 @@ export async function executeOpenCode(
       const code = exitCode ?? 1
 
       if (code !== 0) {
-        logError('[OpenCode] Execution failed', { 
-          exitCode: code, 
+        logError('[OpenCode] Execution failed', {
+          exitCode: code,
           stderr: stderr.slice(0, 500),
           duration,
           durationSec: Math.round(duration / 1000) + 's',
@@ -189,7 +189,7 @@ export async function executeOpenCode(
         return
       }
 
-      info('[OpenCode] Execution completed successfully', { 
+      info('[OpenCode] Execution completed successfully', {
         duration,
         durationSec: Math.round(duration / 1000) + 's',
         outputBytes: stdout.length,
@@ -203,17 +203,17 @@ export async function executeOpenCode(
       clearTimeout(timeoutId)
       clearInterval(statusInterval)
       if (prId) runningProcesses.delete(prId)
-      
+
       if (err.message.includes('SIGTERM')) {
         cancelled = true
         info('[OpenCode] Process terminated', { model: effectiveModel })
         reject(new Error('Review cancelled'))
         return
       }
-      
-      logError('[OpenCode] Spawn error', { 
-        error: err.message, 
-        model: effectiveModel 
+
+      logError('[OpenCode] Spawn error', {
+        error: err.message,
+        model: effectiveModel,
       })
       reject(err)
     })

@@ -30,26 +30,32 @@ function addPRItems(menu: Menu, onShow: () => void): void {
   const pendingPRs = states.filter((s) => s.status === 'new' || s.status === 'seen')
 
   if (pendingPRs.length === 0) {
-    menu.append(new MenuItem({
-      label: 'No PRs pending review',
-      enabled: false,
-    }))
+    menu.append(
+      new MenuItem({
+        label: 'No PRs pending review',
+        enabled: false,
+      })
+    )
     return
   }
 
   pendingPRs.slice(0, 5).forEach((state) => {
     const label = `#${state.pr.number}: ${truncate(state.pr.title, 30)}`
-    menu.append(new MenuItem({
-      label,
-      click: onShow,
-    }))
+    menu.append(
+      new MenuItem({
+        label,
+        click: onShow,
+      })
+    )
   })
 
   if (pendingPRs.length > 5) {
-    menu.append(new MenuItem({
-      label: `... and ${pendingPRs.length - 5} more`,
-      click: onShow,
-    }))
+    menu.append(
+      new MenuItem({
+        label: `... and ${pendingPRs.length - 5} more`,
+        click: onShow,
+      })
+    )
   }
 }
 
@@ -58,37 +64,47 @@ function addStatusItem(menu: Menu): void {
   const status = isPolling() ? 'Active' : 'Paused'
   const lastUpdate = lastPoll ? formatRelativeTime(lastPoll) : 'Never'
 
-  menu.append(new MenuItem({
-    label: `Status: ${status} (Last: ${lastUpdate})`,
-    enabled: false,
-  }))
+  menu.append(
+    new MenuItem({
+      label: `Status: ${status} (Last: ${lastUpdate})`,
+      enabled: false,
+    })
+  )
 }
 
 function addActionItems(menu: Menu, actions: MenuActions): void {
-  menu.append(new MenuItem({
-    label: 'Refresh Now',
-    click: actions.onRefresh,
-  }))
+  menu.append(
+    new MenuItem({
+      label: 'Refresh Now',
+      click: actions.onRefresh,
+    })
+  )
 
-  menu.append(new MenuItem({
-    label: 'Settings...',
-    click: actions.onSettings,
-  }))
+  menu.append(
+    new MenuItem({
+      label: 'Settings...',
+      click: actions.onSettings,
+    })
+  )
 
   if (actions.onRerunSetup) {
-    menu.append(new MenuItem({
-      label: 'Re-run Setup...',
-      click: actions.onRerunSetup,
-    }))
+    menu.append(
+      new MenuItem({
+        label: 'Re-run Setup...',
+        click: actions.onRerunSetup,
+      })
+    )
   }
 
   menu.append(new MenuItem({ type: 'separator' }))
 
-  menu.append(new MenuItem({
-    label: 'Quit',
-    click: actions.onQuit,
-    accelerator: 'Command+Q',
-  }))
+  menu.append(
+    new MenuItem({
+      label: 'Quit',
+      click: actions.onQuit,
+      accelerator: 'Command+Q',
+    })
+  )
 }
 
 function truncate(text: string, maxLength: number): string {

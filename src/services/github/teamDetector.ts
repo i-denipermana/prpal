@@ -9,10 +9,7 @@ export interface UserTeams {
   teamSlugs: string[]
 }
 
-export async function detectUserTeams(
-  client: GitHubClient,
-  org: string
-): Promise<UserTeams> {
+export async function detectUserTeams(client: GitHubClient, org: string): Promise<UserTeams> {
   debug('Detecting user teams', { org })
 
   const teams = await client.get<GitHubTeam[]>('/user/teams')

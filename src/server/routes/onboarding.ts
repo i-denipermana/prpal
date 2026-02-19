@@ -6,10 +6,7 @@ import {
   markOnboardingComplete,
   resetOnboarding,
 } from '../../services/state/onboardingStore.js'
-import {
-  updateGitHubSettings,
-  isConfigured,
-} from '../../services/state/settingsStore.js'
+import { updateGitHubSettings, isConfigured } from '../../services/state/settingsStore.js'
 import { detectOpenCode } from '../../services/opencode/detector.js'
 import { info } from '../../utils/logger.js'
 
@@ -65,10 +62,7 @@ function handleReset(_request: FastifyRequest, reply: FastifyReply): void {
   void reply.send({ success: true })
 }
 
-async function handleCheckOpenCode(
-  _request: FastifyRequest,
-  reply: FastifyReply
-): Promise<void> {
+async function handleCheckOpenCode(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
   const result = await detectOpenCode()
   void reply.send(result)
 }

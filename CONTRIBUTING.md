@@ -482,11 +482,23 @@ We follow [Semantic Versioning](https://semver.org/):
 
 ### Release Steps (Maintainers)
 
-1. Update version: `npm version [major|minor|patch]`
-2. Update CHANGELOG.md
-3. Create release PR
-4. After merge, create GitHub release
-5. Build and upload artifacts
+```bash
+# Using the release script (recommended)
+./scripts/release.sh patch   # 1.0.1 → 1.0.2
+./scripts/release.sh minor   # 1.0.1 → 1.1.0
+./scripts/release.sh major   # 1.0.1 → 2.0.0
+
+# Or using npm directly
+npm version patch -m "chore(release): v%s"
+```
+
+The release process automatically:
+
+1. Runs lint, typecheck, and tests (preversion hook)
+2. Bumps version in package.json
+3. Creates git commit and tag
+4. Pushes to remote (postversion hook)
+5. Triggers GitHub Actions to build and publish release
 
 ### Changelog Format
 

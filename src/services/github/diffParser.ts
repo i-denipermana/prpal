@@ -74,9 +74,7 @@ function parseSingleLine(line: string, currentNewLine: number): ParsedLine | nul
 /** Get all valid line numbers for inline comments (add + context lines only) */
 export function getValidLineNumbers(patch: string): number[] {
   const lines = parseDiffPatch(patch)
-  return lines
-    .filter((l) => l.type === 'add' || l.type === 'context')
-    .map((l) => l.lineNumber)
+  return lines.filter((l) => l.type === 'add' || l.type === 'context').map((l) => l.lineNumber)
 }
 
 /** Find the closest valid line at or before the requested line */

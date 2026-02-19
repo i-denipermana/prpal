@@ -42,7 +42,7 @@ export async function reviewPullRequest(
   const startTime = Date.now()
   const controller = new AbortController()
   activeReviews.set(pr.id, controller)
-  
+
   const effectiveModel = options.model || options.agent.model
   const provider = extractProvider(effectiveModel)
 
@@ -60,11 +60,11 @@ export async function reviewPullRequest(
 
   try {
     checkAborted(controller)
-    
+
     info('[Reviewer] Checking OpenCode installation...')
-    const opencodePath = options.opencodePath || await getOpenCodePath()
+    const opencodePath = options.opencodePath || (await getOpenCodePath())
     info('[Reviewer] OpenCode path:', { path: opencodePath })
-    
+
     const installed = await isOpenCodeInstalled(opencodePath)
     if (!installed) {
       throw createNotInstalledError()
@@ -87,7 +87,7 @@ export async function reviewPullRequest(
       agent: options.agent.id,
       opencodePath,
     })
-    
+
     const result = await executeOpenCode(
       {
         prompt,

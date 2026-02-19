@@ -6,7 +6,7 @@ import { debug, info } from '../../utils/logger.js'
 type PRStateMap = Map<string, PRState>
 type ChangeListener = (prId: string, state: PRState) => void
 
-let prStates: PRStateMap = new Map()
+const prStates: PRStateMap = new Map()
 let listeners: ChangeListener[] = []
 let userTeamSlugs: string[] = []
 
@@ -78,10 +78,10 @@ export function addPR(pr: PullRequest, needsMyReview = false): PRState {
 }
 
 function updateExistingPR(existing: PRState, pr: PullRequest, needsMyReview?: boolean): PRState {
-  const updated: PRState = { 
-    ...existing, 
+  const updated: PRState = {
+    ...existing,
     pr,
-    needsMyReview: needsMyReview ?? existing.needsMyReview 
+    needsMyReview: needsMyReview ?? existing.needsMyReview,
   }
   setPRState(pr.id, updated)
   return updated

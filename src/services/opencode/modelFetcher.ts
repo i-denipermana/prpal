@@ -36,14 +36,14 @@ export async function fetchAvailableModels(
   try {
     const output = await executeModelsCommand(opencodePath, refresh)
     const models = parseModelsOutput(output)
-    
+
     cache = { models, fetchedAt: Date.now() }
     info('[Models] Fetched models', { count: models.length })
-    
+
     return models
   } catch (err) {
-    logError('[Models] Failed to fetch models', { 
-      error: err instanceof Error ? err.message : String(err) 
+    logError('[Models] Failed to fetch models', {
+      error: err instanceof Error ? err.message : String(err),
     })
     return cache?.models ?? getDefaultModels()
   }
@@ -89,7 +89,7 @@ function executeModelsCommand(opencodePath: string, refresh: boolean): Promise<s
 function parseModelsOutput(output: string): ModelInfo[] {
   const models: ModelInfo[] = []
   const lines = output.split('\n')
-  
+
   let currentModelId = ''
   let jsonBuffer = ''
   let inJson = false
@@ -136,7 +136,7 @@ function parseModelJson(modelId: string, json: string): ModelInfo | null {
   try {
     const data = JSON.parse(json)
     const [provider] = modelId.split('/')
-    
+
     return {
       id: modelId,
       provider,
@@ -161,7 +161,11 @@ function parseModelJson(modelId: string, json: string): ModelInfo | null {
 function getDefaultModels(): ModelInfo[] {
   return [
     { id: 'anthropic/claude-sonnet-4-5', provider: 'anthropic', name: 'Claude Sonnet 4.5' },
-    { id: 'anthropic/claude-3-5-sonnet-20241022', provider: 'anthropic', name: 'Claude 3.5 Sonnet' },
+    {
+      id: 'anthropic/claude-3-5-sonnet-20241022',
+      provider: 'anthropic',
+      name: 'Claude 3.5 Sonnet',
+    },
     { id: 'anthropic/claude-3-5-haiku-latest', provider: 'anthropic', name: 'Claude 3.5 Haiku' },
     { id: 'openai/gpt-4o', provider: 'openai', name: 'GPT-4o' },
     { id: 'openai/gpt-4o-mini', provider: 'openai', name: 'GPT-4o Mini' },
@@ -170,13 +174,13 @@ function getDefaultModels(): ModelInfo[] {
 
 export function getModelsByProvider(models: ModelInfo[]): Map<string, ModelInfo[]> {
   const byProvider = new Map<string, ModelInfo[]>()
-  
+
   for (const model of models) {
     const list = byProvider.get(model.provider) ?? []
     list.push(model)
     byProvider.set(model.provider, list)
   }
-  
+
   return byProvider
 }
 

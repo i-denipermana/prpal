@@ -89,8 +89,8 @@ async function executeReview(
   const configuredModel = getConfiguredModel()
   const timeoutMs = getReviewTimeout()
 
-  info(`[Review] Starting review for PR #${pr.number}`, { 
-    prId, 
+  info(`[Review] Starting review for PR #${pr.number}`, {
+    prId,
     repo: pr.repository.fullName,
     agent: agent!.id,
     agentName: agent!.name,
@@ -106,7 +106,7 @@ async function executeReview(
     info(`[Review] Fetching diff for PR #${pr.number}`)
     updateReviewStage(prId, 'fetching_diff')
     const diff = await fetchPRDiff(client, owner, name, pr.number)
-    info(`[Review] Diff fetched`, { 
+    info(`[Review] Diff fetched`, {
       prNumber: pr.number,
       diffBytes: diff.length,
       diffLines: diff.split('\n').length,
@@ -119,9 +119,9 @@ async function executeReview(
       agent: agent!.id,
     })
     updateReviewStage(prId, 'analyzing')
-    
-    const result = await reviewPullRequest(pr, { 
-      agent: agent!, 
+
+    const result = await reviewPullRequest(pr, {
+      agent: agent!,
       diff,
       model: configuredModel,
       timeoutMs,
@@ -132,7 +132,7 @@ async function executeReview(
       },
     })
 
-    info(`[Review] Completed for PR #${pr.number}`, { 
+    info(`[Review] Completed for PR #${pr.number}`, {
       model: configuredModel,
       verdict: result.output.verdict,
       issues: result.output.issues.length,
@@ -173,7 +173,7 @@ function handleCancelReview(
 ): void {
   const prId = decodeURIComponent(request.params.prId)
   info(`[Review] Cancel requested for PR: ${prId}`)
-  
+
   const cancelled = cancelReview(prId)
   if (cancelled) {
     setReviewCancelled(prId)
@@ -215,7 +215,14 @@ async function handlePostReview(
     return
   }
 
-  const { review, action, formatOptions, editedBody, includeInlineComments, selectedCommentIndices } = request.body
+  const {
+    review,
+    action,
+    formatOptions,
+    editedBody,
+    includeInlineComments,
+    selectedCommentIndices,
+  } = request.body
 
   // Get inline comments from store
   const inlineComments = includeInlineComments ? getInlineComments(prId) : undefined

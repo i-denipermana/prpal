@@ -1,0 +1,102 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run typecheck
+        run: npm run typecheck
+
+      - name: Run tests
+        run: npm run test
+
+  build:
+    needs: test
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        include:
+          - arch: x64
+            name: Intel
+          - arch: arm64
+            name: Apple Silicon
+          - arch: universal
+            name: Universal
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Build macOS app (${{ matrix.name }})
+        run: npx electron-builder --mac --${{ matrix.arch }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: PRPal-${{ matrix.arch }}
+          path: |
+            release/*.dmg
+            release/*.zip
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: List artifacts
+        run: find artifacts -type f | head -20
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
+          body: |
+            ## Downloads
+
+            | Platform | Download |
+            |----------|----------|
+            | Apple Silicon (M1/M2/M3) | `PRPal-*-arm64.dmg` |
+            | Intel | `PRPal-*-mac.dmg` or `PRPal-*-x64.dmg` |
+            | Universal (both) | `PRPal-*-universal.dmg` |
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

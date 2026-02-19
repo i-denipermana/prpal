@@ -7,19 +7,19 @@ export function parseReviewResponse(output: string): AIReviewOutput {
   // First, extract text from OpenCode JSON events if present
   const textContent = extractTextFromEvents(output)
   const contentToParse = textContent || output
-  
-  info('[Parser] Parsing AI response', { 
+
+  info('[Parser] Parsing AI response', {
     rawLength: output.length,
     extractedLength: contentToParse.length,
     hasEvents: textContent !== null,
   })
-  
+
   // Log the extracted text content for debugging
   if (textContent) {
     info('[Parser] AI Response Text:')
     logMultiline(textContent)
   }
-  
+
   const json = extractJson(contentToParse)
   if (!json) {
     warn('[Parser] Failed to extract JSON from response, using fallback')
@@ -30,7 +30,7 @@ export function parseReviewResponse(output: string): AIReviewOutput {
   // Log the parsed review nicely
   const review = validateAndNormalizeReview(json)
   logParsedReview(review)
-  
+
   return review
 }
 
@@ -49,7 +49,7 @@ function logParsedReview(review: AIReviewOutput): void {
   info('[Parser] ═══════════════════════════════════════════════════════')
   info(`[Parser] Summary: ${review.summary}`)
   info(`[Parser] Verdict: ${review.verdict.toUpperCase()}`)
-  
+
   if (review.issues.length > 0) {
     info(`[Parser] Issues (${review.issues.length}):`)
     review.issues.forEach((issue, i) => {
@@ -63,7 +63,7 @@ function logParsedReview(review: AIReviewOutput): void {
   } else {
     info('[Parser] Issues: None')
   }
-  
+
   if (review.suggestions.length > 0) {
     info(`[Parser] Suggestions (${review.suggestions.length}):`)
     review.suggestions.forEach((sug, i) => {
@@ -71,23 +71,23 @@ function logParsedReview(review: AIReviewOutput): void {
       info(`[Parser]   ${i + 1}. ${sug.message}${location ? ` (${location})` : ''}`)
     })
   }
-  
+
   if (review.positives && review.positives.length > 0) {
     info(`[Parser] Positives (${review.positives.length}):`)
     review.positives.forEach((pos, i) => {
       info(`[Parser]   ${i + 1}. ${pos}`)
     })
   }
-  
+
   info('[Parser] ═══════════════════════════════════════════════════════')
 }
 
 function extractTextFromEvents(output: string): string | null {
   // OpenCode outputs JSON events, one per line
   // We need to extract text parts from these events
-  const lines = output.split('\n').filter(line => line.trim())
+  const lines = output.split('\n').filter((line) => line.trim())
   const textParts: string[] = []
-  
+
   for (const line of lines) {
     try {
       const event = JSON.parse(line)
@@ -100,18 +100,18 @@ function extractTextFromEvents(output: string): string | null {
       continue
     }
   }
-  
+
   if (textParts.length > 0) {
     debug('[Parser] Extracted text from events', { parts: textParts.length })
     return textParts.join('\n')
   }
-  
+
   return null
 }
 
 function extractJson(output: string): unknown | null {
   // Try multiple strategies to extract JSON
-  
+
   // Strategy 1: Look for ```json code block
   const jsonBlockMatch = output.match(/```json\s*([\s\S]*?)```/)
   if (jsonBlockMatch) {
@@ -121,7 +121,7 @@ function extractJson(output: string): unknown | null {
       debug('[Parser] Failed to parse json code block')
     }
   }
-  
+
   // Strategy 2: Look for any ``` code block
   const codeBlockMatch = output.match(/```\s*([\s\S]*?)```/)
   if (codeBlockMatch) {
@@ -131,14 +131,14 @@ function extractJson(output: string): unknown | null {
       debug('[Parser] Failed to parse generic code block')
     }
   }
-  
+
   // Strategy 3: Try to parse the whole output as JSON
   try {
     return JSON.parse(output.trim())
   } catch {
     debug('[Parser] Failed to parse whole output as JSON')
   }
-  
+
   // Strategy 4: Find JSON object that starts with {"summary"
   const summaryMatch = output.match(/\{\s*"summary"\s*:\s*"[\s\S]*?\}(?=\s*$|\s*```|$)/)
   if (summaryMatch) {
@@ -148,7 +148,7 @@ function extractJson(output: string): unknown | null {
       debug('[Parser] Failed to parse summary-based match')
     }
   }
-  
+
   // Strategy 5: Find the first complete JSON object with balanced braces
   const jsonObj = extractBalancedJson(output)
   if (jsonObj) {
@@ -158,7 +158,7 @@ function extractJson(output: string): unknown | null {
       debug('[Parser] Failed to parse balanced JSON')
     }
   }
-  
+
   return null
 }
 
@@ -166,39 +166,39 @@ function extractBalancedJson(text: string): string | null {
   // Find the first { and extract balanced JSON
   const startIdx = text.indexOf('{')
   if (startIdx === -1) return null
-  
+
   let depth = 0
   let inString = false
   let escaped = false
-  
+
   for (let i = startIdx; i < text.length; i++) {
     const char = text[i]
-    
+
     if (escaped) {
       escaped = false
       continue
     }
-    
+
     if (char === '\\' && inString) {
       escaped = true
       continue
     }
-    
+
     if (char === '"' && !escaped) {
       inString = !inString
       continue
     }
-    
+
     if (inString) continue
-    
+
     if (char === '{') depth++
     if (char === '}') depth--
-    
+
     if (depth === 0) {
       return text.slice(startIdx, i + 1)
     }
   }
-  
+
   return null
 }
 

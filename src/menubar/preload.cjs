@@ -38,4 +38,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openExternal: (url) => {
     return ipcRenderer.invoke('shell:openExternal', url)
   },
+
+  // Quit the app
+  quitApp: () => {
+    return ipcRenderer.invoke('app:quit')
+  },
 })

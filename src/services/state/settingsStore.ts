@@ -35,11 +35,7 @@ export function getSettings(): ResolvedConfig {
   return currentConfig
 }
 
-export function updateGitHubSettings(
-  pat: string,
-  username: string,
-  org: string
-): ResolvedConfig {
+export function updateGitHubSettings(pat: string, username: string, org: string): ResolvedConfig {
   if (!currentConfig) {
     currentConfig = tryLoadConfig() ?? { ...DEFAULT_CONFIG }
   }
@@ -91,9 +87,7 @@ export function updateOpenCodeFolders(
   return currentConfig!
 }
 
-export function updateReviewFormatSettings(
-  format: Partial<ReviewFormatConfig>
-): ResolvedConfig {
+export function updateReviewFormatSettings(format: Partial<ReviewFormatConfig>): ResolvedConfig {
   ensureConfig()
   currentConfig = {
     ...currentConfig!,
@@ -103,10 +97,7 @@ export function updateReviewFormatSettings(
   return currentConfig!
 }
 
-export function updateNotificationSettings(
-  enabled: boolean,
-  sound: boolean
-): ResolvedConfig {
+export function updateNotificationSettings(enabled: boolean, sound: boolean): ResolvedConfig {
   ensureConfig()
   currentConfig = { ...currentConfig!, notification: { enabled, sound } }
   saveSettings()

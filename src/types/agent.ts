@@ -39,7 +39,7 @@ export interface ReviewAgent {
   updatedAt: Date
   maxSteps?: number
   focus?: ReviewFocus[]
-  skills?: string[]  // SkillId for built-in, 'custom:id' for custom skills
+  skills?: string[] // SkillId for built-in, 'custom:id' for custom skills
 }
 
 export interface AgentTemplate {

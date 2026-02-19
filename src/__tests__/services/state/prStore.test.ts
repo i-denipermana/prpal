@@ -45,7 +45,7 @@ describe('prStore', () => {
   describe('addPR', () => {
     it('should add a new PR with status "new"', () => {
       const pr = createMockPR('repo#1', 1)
-      
+
       const state = addPR(pr)
 
       expect(state.status).toBe('new')

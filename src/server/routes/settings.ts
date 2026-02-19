@@ -49,7 +49,13 @@ function handleGetSettings(_request: FastifyRequest, reply: FastifyReply): void 
 interface UpdateAllBody {
   github?: { pat?: string; username?: string; org?: string }
   polling?: { intervalMs?: number }
-  opencode?: { enabled?: boolean; model?: string; autoReview?: boolean; skillsFolder?: string; memoriesFolder?: string }
+  opencode?: {
+    enabled?: boolean
+    model?: string
+    autoReview?: boolean
+    skillsFolder?: string
+    memoriesFolder?: string
+  }
   notification?: { enabled?: boolean; sound?: boolean }
   reviewFormat?: { style?: string; attribution?: string }
 }
@@ -75,7 +81,7 @@ async function handleUpdateSettings(
       body.opencode.model ?? current.model,
       body.opencode.autoReview ?? current.autoReview
     )
-    
+
     // Handle folder paths separately and reinitialize skills
     if (body.opencode.skillsFolder !== undefined || body.opencode.memoriesFolder !== undefined) {
       const skillsFolder = body.opencode.skillsFolder ?? current.skillsFolder
@@ -95,7 +101,12 @@ async function handleUpdateSettings(
   }
 
   if (body.reviewFormat) {
-    updateReviewFormatSettings(body.reviewFormat as { style?: 'minimal' | 'standard' | 'detailed'; attribution?: 'none' | 'subtle' | 'full' })
+    updateReviewFormatSettings(
+      body.reviewFormat as {
+        style?: 'minimal' | 'standard' | 'detailed'
+        attribution?: 'none' | 'subtle' | 'full'
+      }
+    )
   }
 
   info('Settings updated via API')

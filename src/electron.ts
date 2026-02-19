@@ -34,7 +34,7 @@ import type { ResolvedConfig } from './types/config.js'
 
 let mb: Menubar | null = null
 let server: Awaited<ReturnType<typeof createServer>> | null = null
-let openDetailWindows = new Set<BrowserWindow>()
+const openDetailWindows = new Set<BrowserWindow>()
 
 async function main(): Promise<void> {
   info('Starting PRPal (Electron)...')
@@ -50,7 +50,7 @@ async function main(): Promise<void> {
   // Hide dock icon initially (macOS only) - run as accessory app
   if (process.platform === 'darwin') {
     app.setActivationPolicy('accessory')
-    app.dock.hide()
+    app.dock?.hide()
   }
 
   // Check if onboarding is needed
@@ -136,6 +136,7 @@ function createMenubarApp(config: ResolvedConfig): void {
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
+        preload: getPreloadPath(),
       },
     },
     showDockIcon: false,
@@ -299,12 +300,12 @@ async function updateDockVisibility(): Promise<void> {
     // 'regular' = normal app (appears in dock and switcher)
     // 'accessory' = background app (no dock, no switcher)
     app.setActivationPolicy('regular')
-    await app.dock.show()
+    await app.dock?.show()
   } else {
     // Hide from dock when no detail windows
     info('[Dock] Hiding dock icon (no detail windows)')
     app.setActivationPolicy('accessory')
-    app.dock.hide()
+    app.dock?.hide()
   }
 }
 

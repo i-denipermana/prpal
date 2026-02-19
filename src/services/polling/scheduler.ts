@@ -41,7 +41,7 @@ export function startPolling(
 
   pollCallback = callback
   state.isRunning = true
-  
+
   // Store user teams for PR route access
   setUserTeams(userTeams.teamSlugs)
 
@@ -96,13 +96,13 @@ async function runPoll(
 
   try {
     const allPRs = await fetchAllOrgPRs(client, { org })
-    
+
     // Get all non-draft PRs from others
     const allOthersPRs = filterPRsForReview(allPRs, { username, userTeams, showAllPRs: true })
-    
+
     // Get PRs specifically requesting my review
     const myReviewPRs = filterPRsForReview(allPRs, { username, userTeams, showAllPRs: false })
-    const myReviewPRIds = new Set(myReviewPRs.map(pr => pr.id))
+    const myReviewPRIds = new Set(myReviewPRs.map((pr) => pr.id))
 
     const syncOptions: SyncPRsOptions = { prs: allOthersPRs, myReviewPRIds }
     const { added } = syncPRs(syncOptions)

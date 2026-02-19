@@ -55,7 +55,7 @@ async function handleRefresh(_request: FastifyRequest, reply: FastifyReply): Pro
   try {
     const prs = await pollNow(context.client, context.org, context.username, context.userTeams)
     void reply.send({ success: true, count: prs.length })
-  } catch (error) {
+  } catch (_error) {
     void reply.status(500).send({ error: 'Failed to refresh PRs' })
   }
 }

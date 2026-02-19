@@ -61,7 +61,7 @@ export interface ResolvedConfig {
   github: GitHubConfig
   polling: Required<PollingConfig>
   server: Required<ServerConfig>
-  opencode: Required<Omit<OpenCodeConfig, 'path' | 'skillsFolder' | 'memoriesFolder'>> & { 
+  opencode: Required<Omit<OpenCodeConfig, 'path' | 'skillsFolder' | 'memoriesFolder'>> & {
     path?: string
     skillsFolder?: string
     memoriesFolder?: string

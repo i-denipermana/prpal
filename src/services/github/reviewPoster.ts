@@ -141,10 +141,7 @@ function getSeverityLabel(severity: ReviewIssue['severity']): string {
   return map[severity]
 }
 
-export function formatReviewBody(
-  review: AIReviewOutput,
-  options: ReviewFormatOptions
-): string {
+export function formatReviewBody(review: AIReviewOutput, options: ReviewFormatOptions): string {
   switch (options.style) {
     case 'minimal':
       return formatMinimalReview(review, options)

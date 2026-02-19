@@ -45,12 +45,7 @@ export interface ReviewResult {
   duration: number
 }
 
-export type ReviewStage = 
-  | 'starting'
-  | 'fetching_diff'
-  | 'analyzing'
-  | 'generating'
-  | 'parsing'
+export type ReviewStage = 'starting' | 'fetching_diff' | 'analyzing' | 'generating' | 'parsing'
 
 export interface ReviewState {
   prId: string

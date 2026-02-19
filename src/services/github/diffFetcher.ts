@@ -27,9 +27,7 @@ export async function fetchPRFiles(
 ): Promise<PRFile[]> {
   debug('Fetching PR files', { owner, repo, prNumber })
 
-  const files = await client.get<GitHubFile[]>(
-    `/repos/${owner}/${repo}/pulls/${prNumber}/files`
-  )
+  const files = await client.get<GitHubFile[]>(`/repos/${owner}/${repo}/pulls/${prNumber}/files`)
 
   return files.map(mapGitHubFileToPRFile)
 }

@@ -108,13 +108,13 @@ List all tracked pull requests where you are a requested reviewer.
 {
   "prs": [
     {
-      "id": "OsomePteLtd/repo#123",
+      "id": "my-org/repo#123",
       "number": 123,
       "title": "Add new feature",
       "author": "username",
       "authorAvatar": "https://avatars.githubusercontent.com/u/123",
-      "repository": "OsomePteLtd/repo",
-      "htmlUrl": "https://github.com/OsomePteLtd/repo/pull/123",
+      "repository": "my-org/repo",
+      "htmlUrl": "https://github.com/my-org/repo/pull/123",
       "updatedAt": "2024-01-15T10:00:00.000Z",
       "reviewStatus": "pending",
       "hasNewActivity": true,
@@ -155,13 +155,13 @@ Get detailed PR information including diff, files, and CI checks.
 
 | Parameter | Type     | Description                                          |
 | --------- | -------- | ---------------------------------------------------- |
-| `id`      | `string` | URL-encoded PR ID (e.g., `OsomePteLtd%2Frepo%23123`) |
+| `id`      | `string` | URL-encoded PR ID (e.g., `my-org%2Frepo%23123`) |
 
 **Response**
 
 ```json
 {
-  "id": "OsomePteLtd/repo#123",
+  "id": "my-org/repo#123",
   "number": 123,
   "title": "Add new feature",
   "body": "## Description\nThis PR adds...",
@@ -170,11 +170,11 @@ Get detailed PR information including diff, files, and CI checks.
     "avatar_url": "https://avatars.githubusercontent.com/u/123"
   },
   "repository": {
-    "owner": "OsomePteLtd",
+    "owner": "my-org",
     "name": "repo",
-    "fullName": "OsomePteLtd/repo"
+    "fullName": "my-org/repo"
   },
-  "htmlUrl": "https://github.com/OsomePteLtd/repo/pull/123",
+  "htmlUrl": "https://github.com/my-org/repo/pull/123",
   "state": "open",
   "draft": false,
   "head": {
@@ -330,7 +330,7 @@ Start an AI-powered code review for a pull request.
 ```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
-  "prId": "OsomePteLtd/repo#123",
+  "prId": "my-org/repo#123",
   "prNumber": 123,
   "agentId": "pr-reviewer",
   "output": {
@@ -431,7 +431,7 @@ Get the current review status or result for a PR.
 
 ```json
 {
-  "prId": "OsomePteLtd/repo#123",
+  "prId": "my-org/repo#123",
   "status": "in_progress",
   "stage": "analyzing",
   "progress": 50,
@@ -443,7 +443,7 @@ Get the current review status or result for a PR.
 
 ```json
 {
-  "prId": "OsomePteLtd/repo#123",
+  "prId": "my-org/repo#123",
   "status": "completed",
   "result": {
     "id": "...",
@@ -469,7 +469,7 @@ Get the current review status or result for a PR.
 
 ```json
 {
-  "prId": "OsomePteLtd/repo#123",
+  "prId": "my-org/repo#123",
   "status": "failed",
   "error": "OpenCode timeout after 120000ms",
   "completedAt": "2024-01-15T10:32:00.000Z"
@@ -571,7 +571,7 @@ Post a completed review to GitHub.
 ```json
 {
   "id": 123456789,
-  "htmlUrl": "https://github.com/OsomePteLtd/repo/pull/123#pullrequestreview-123456789",
+  "htmlUrl": "https://github.com/my-org/repo/pull/123#pullrequestreview-123456789",
   "state": "COMMENTED",
   "postedAt": "2024-01-15T10:35:00.000Z"
 }
@@ -744,8 +744,8 @@ List all available skills (built-in and custom).
       "isCustom": false
     },
     {
-      "id": "custom:osome-conventions",
-      "name": "Osome Conventions",
+      "id": "custom:company-conventions",
+      "name": "Company Conventions",
       "description": "Company-specific coding standards",
       "icon": "document",
       "isCustom": true
@@ -797,7 +797,7 @@ Get current application settings.
 {
   "github": {
     "username": "your-username",
-    "org": "OsomePteLtd"
+    "org": "my-org"
   },
   "polling": {
     "intervalMs": 300000
@@ -873,7 +873,7 @@ Validate GitHub credentials during onboarding.
 {
   "pat": "ghp_xxxxxxxxxxxx",
   "username": "your-username",
-  "org": "OsomePteLtd"
+  "org": "my-org"
 }
 ```
 
@@ -888,8 +888,8 @@ Validate GitHub credentials during onboarding.
     "avatar_url": "https://..."
   },
   "org": {
-    "login": "OsomePteLtd",
-    "name": "Osome Pte Ltd"
+    "login": "my-org",
+    "name": "My Organization"
   },
   "teams": ["backend", "platform"]
 }
@@ -917,7 +917,7 @@ Complete onboarding and save settings.
   "github": {
     "pat": "ghp_xxxxxxxxxxxx",
     "username": "your-username",
-    "org": "OsomePteLtd"
+    "org": "my-org"
   }
 }
 ```

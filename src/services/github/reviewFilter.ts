@@ -10,10 +10,7 @@ export interface FilterConfig {
   showAllPRs?: boolean // If true, show all PRs not authored by user
 }
 
-export function filterPRsForReview(
-  prs: PullRequest[],
-  config: FilterConfig
-): PullRequest[] {
+export function filterPRsForReview(prs: PullRequest[], config: FilterConfig): PullRequest[] {
   const filtered = prs.filter((pr) => shouldShowPR(pr, config))
   debug(`Filtered ${filtered.length} PRs for review from ${prs.length} total`)
   return filtered
@@ -31,10 +28,7 @@ function shouldShowPR(pr: PullRequest, config: FilterConfig): boolean {
   return isUserRequested(pr, config.username) || isTeamRequested(pr, config.userTeams)
 }
 
-export function isReviewRequestedFromUser(
-  pr: PullRequest,
-  config: FilterConfig
-): boolean {
+export function isReviewRequestedFromUser(pr: PullRequest, config: FilterConfig): boolean {
   return shouldShowPR(pr, config)
 }
 
@@ -52,9 +46,7 @@ function isTeamRequested(pr: PullRequest, userTeams: UserTeams): boolean {
   return requestedSlugs.some((slug) => userTeams.teamSlugs.includes(slug))
 }
 
-export function groupPRsByRepo(
-  prs: PullRequest[]
-): Map<string, PullRequest[]> {
+export function groupPRsByRepo(prs: PullRequest[]): Map<string, PullRequest[]> {
   const grouped = new Map<string, PullRequest[]>()
 
   for (const pr of prs) {

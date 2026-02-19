@@ -240,7 +240,7 @@ Create a markdown file in your skills folder:
 cat > ~/.config/prpal/skills/company-standards.md << 'EOF'
 ---
 name: Company Standards
-description: Osome coding conventions and standards
+description: Your company coding conventions and standards
 icon: building
 ---
 
